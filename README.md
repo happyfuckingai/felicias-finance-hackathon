@@ -1,22 +1,27 @@
-# 🧠 Friday - Your Personal AI Assistant
+# 🧠 Friday - Your Personal AI Assistant - Part 2
 
 This is a Python-based AI assistant inspired by *Jarvis*, capable of:
 
 - 🔍 Searching the web  
 - 🌤️ Weather checking
 - 📨 Sending Emails 
-- 📷 Vision through camera (Web app
+- 📷 Vision through camera (Web app)
 - 🗣️ Speech
 - 📝 Chat (Web app) 
+- 🧠 Smart Memory System
+- 🎵 Spotify Integration
 
-This agent uses LiveKit that is 100% free!
 
 ---
 
 ## 📽️ Tutorial Video
 
-Before you start, **make sure to follow this tutorial to set up the voice agent correctly**:  
+Here is part 1 , **make sure to follow this tutorial to set up the voice agent correctly**:  
 🎥 [Watch here](https://youtu.be/An4NwL8QSQ4?si=v1dNDDonmpCG1Els)
+
+Here is part 2 **to use the memory system and the n8n MCP server follow this tutorial**
+🎥 [Watch here](https://www.youtube.com/watch?v=gqmSKEUpRv8&ab_channel=Thanh-yDavidNguyen)
+
 
 ---
 1. Create the Virtual Envrionment first!
@@ -25,4 +30,6 @@ Before you start, **make sure to follow this tutorial to set up the voice agent 
 4. In the .ENV - File you should paste your API-Keys and your LiveKit Secret, LiveKit URL.
    If you want to use the Send Email Tool also specify your Gmail Account and App Password. 
 5. Make sure that your LiveKit Account is set-up correctly. 
+6. Make sure that your Mem0 Account is set-up correctly.
+7. Make sure to have a MCP Server correctly set-up.
 
