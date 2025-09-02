@@ -33,3 +33,13 @@ Here is part 2 **to use the memory system and the n8n MCP server follow this tut
 6. Make sure that your Mem0 Account is set-up correctly.
 7. Make sure to have a MCP Server correctly set-up.
 
+
+## Licenses
+
+- Proprietary portions: All files except `mcp_client` and portions of `agent.py` not authored by Thanh-Y Nguyen — Copyright © 2025 Thanh-Y Nguyen.  
+  Licensed for private/educational use only. Redistribution, publication, or commercial use is prohibited without written permission.  
+
+- Third-party components:
+  - `mcp_client` — Copyright © LiveKit, Inc., MIT License.  
+  - Portions of `agent.py` not authored by Thanh-Y Nguyen — MIT or other applicable license.  
+  See `LICENSE-LIVEKIT` for details.
