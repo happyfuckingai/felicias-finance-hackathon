@@ -1,0 +1,69 @@
+# Multi-stage build for BigQuery Analytics Service
+# Stage 1: Builder
+FROM python:3.11-slim as builder
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY crypto/requirements.txt ./
+COPY crypto/config/requirements.txt ./config-requirements.txt
+
+# Combine requirements
+RUN cat requirements.txt config-requirements.txt > combined-requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --user --prefix=/install -r combined-requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.11-slim as runtime
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r bigqueryuser && useradd -r -g bigqueryuser bigqueryuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /install /usr/local
+
+# Copy application code
+COPY crypto/ ./crypto/
+COPY shared/ ./shared/ 2>/dev/null || true
+
+# Copy BigQuery configuration
+COPY crypto/config/bigquery_config.py ./crypto/config/
+COPY crypto/config/bigquery_queries.py ./crypto/config/
+
+# Set proper ownership
+RUN chown -R bigqueryuser:bigqueryuser /app
+USER bigqueryuser
+
+# Environment variables
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/service-account.json"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Start application
+CMD ["python", "-m", "crypto.services.bigquery_web3_demo"]

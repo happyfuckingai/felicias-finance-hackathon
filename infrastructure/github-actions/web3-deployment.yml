@@ -1,0 +1,431 @@
+name: Web3 Infrastructure Deployment
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'infrastructure/**'
+      - 'crypto/**'
+      - 'Dockerfile*'
+      - '.github/workflows/web3-deployment.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'infrastructure/**'
+      - 'crypto/**'
+      - 'Dockerfile*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      terraform_action:
+        description: 'Terraform action'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+        - plan
+        - apply
+        - destroy
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY || 'gcr.io' }}
+  ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST || 'us-central1-docker.pkg.dev' }}
+
+jobs:
+  validate:
+    name: Validate Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.config.outputs.environment }}
+      should_deploy: ${{ steps.config.outputs.should_deploy }}
+      docker_changed: ${{ steps.docker-check.outputs.changed }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure environment
+        id: config
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Docker changes
+        id: docker-check
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -q "Dockerfile"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate Terraform configuration
+        run: |
+          cd infrastructure/terraform
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Dockerfiles
+        run: |
+          find . -name "Dockerfile*" -type f | while read -r dockerfile; do
+            echo "Validating $dockerfile"
+            docker build --dry-run -f "$dockerfile" .
+          done
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.should_deploy == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --all-projects
+
+      - name: Run Checkov for infrastructure security
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/
+          framework: terraform
+          check: CKV_GCP_*
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: [validate, security-scan]
+    if: needs.validate.outputs.should_deploy == 'true'
+    strategy:
+      matrix:
+        service: [web3-provider, bigquery-service, web3-security]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY }}
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: |
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY_HOST }} --quiet
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./infrastructure/docker/Dockerfile.${{ matrix.service }}
+          push: false
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.service }}:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.service }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run tests
+        run: |
+          # Run service-specific tests
+          if [[ "${{ matrix.service }}" == "web3-provider" ]]; then
+            echo "Running Web3 provider tests..."
+            # Add Web3 provider specific tests here
+          elif [[ "${{ matrix.service }}" == "bigquery-service" ]]; then
+            echo "Running BigQuery service tests..."
+            # Add BigQuery service specific tests here
+          elif [[ "${{ matrix.service }}" == "web3-security" ]]; then
+            echo "Running Web3 security tests..."
+            # Add Web3 security specific tests here
+          fi
+
+      - name: Integration tests
+        run: |
+          echo "Running integration tests for ${{ matrix.service }}"
+          # Add integration tests here
+          # This could include API endpoint testing, database connectivity, etc.
+
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: [validate, build-and-test]
+    if: needs.validate.outputs.should_deploy == 'true' && (github.event.inputs.terraform_action == 'plan' || github.event.inputs.terraform_action == 'apply')
+    outputs:
+      tfplan-exist: ${{ steps.plan.outputs.tfplan-exist }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.5.0"
+
+      - name: Create Terraform variables file
+        run: |
+          cat > infrastructure/terraform/terraform.tfvars << EOF
+          project_id = "${{ env.GCP_PROJECT_ID }}"
+          region = "${{ env.GCP_REGION }}"
+          environment = "${{ needs.validate.outputs.environment }}"
+          web3_provider_image = "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-provider:${{ github.sha }}"
+          bigquery_service_image = "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/bigquery-service:${{ github.sha }}"
+          web3_security_image = "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-security:${{ github.sha }}"
+          security_contact_email = "${{ secrets.SECURITY_CONTACT_EMAIL }}"
+          pgp_public_key = "${{ secrets.PGP_PUBLIC_KEY }}"
+          organization_id = "${{ secrets.GCP_ORGANIZATION_ID }}"
+          EOF
+
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform
+          terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd infrastructure/terraform
+          terraform plan -var-file=terraform.tfvars -out=tfplan
+          if [[ -f tfplan ]]; then
+            echo "tfplan-exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "tfplan-exist=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ needs.validate.outputs.environment }}
+          path: infrastructure/terraform/tfplan
+          retention-days: 30
+
+      - name: Terraform Plan Status
+        run: |
+          cd infrastructure/terraform
+          terraform show -no-color tfplan
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: [terraform-plan]
+    if: needs.validate.outputs.should_deploy == 'true' && needs.terraform-plan.outputs.tfplan-exist == 'true' && (github.event.inputs.terraform_action == 'apply' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    environment:
+      name: ${{ needs.validate.outputs.environment }}
+      url: ${{ steps.deploy.outputs.dashboard_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.5.0"
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ needs.validate.outputs.environment }}
+          path: infrastructure/terraform/
+
+      - name: Terraform Apply
+        id: deploy
+        run: |
+          cd infrastructure/terraform
+          terraform apply -auto-approve tfplan
+
+          # Extract outputs
+          WEB3_PROVIDER_URL=$(terraform output -raw web3_provider_service | jq -r '.url')
+          BIGQUERY_SERVICE_URL=$(terraform output -raw bigquery_service | jq -r '.url')
+          DASHBOARD_URL="https://console.cloud.google.com/monitoring?project=${{ env.GCP_PROJECT_ID }}"
+
+          echo "web3_provider_url=$WEB3_PROVIDER_URL" >> $GITHUB_OUTPUT
+          echo "bigquery_service_url=$BIGQUERY_SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "dashboard_url=$DASHBOARD_URL" >> $GITHUB_OUTPUT
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying Web3 Provider deployment..."
+          curl -f -H "Authorization: Bearer ${{ secrets.WEB3_API_TOKEN }}" \
+               "${{ steps.deploy.outputs.web3_provider_url }}/health" || exit 1
+
+          echo "Verifying BigQuery Service deployment..."
+          curl -f -H "Authorization: Bearer ${{ secrets.BIGQUERY_API_TOKEN }}" \
+               "${{ steps.deploy.outputs.bigquery_service_url }}/health" || exit 1
+
+      - name: Run post-deployment tests
+        run: |
+          echo "Running post-deployment integration tests..."
+          # Add post-deployment validation tests here
+
+      - name: Update deployment status
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Web3 Provider URL: ${{ steps.deploy.outputs.web3_provider_url }}"
+          echo "BigQuery Service URL: ${{ steps.deploy.outputs.bigquery_service_url }}"
+          echo "Monitoring Dashboard: ${{ steps.deploy.outputs.dashboard_url }}"
+
+  docker-push:
+    name: Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [validate, build-and-test]
+    if: needs.validate.outputs.should_deploy == 'true' && needs.validate.outputs.docker_changed == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY }}
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: |
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY_HOST }} --quiet
+
+      - name: Build and push Web3 Provider
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./infrastructure/docker/Dockerfile.web3-provider
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-provider:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-provider:${{ needs.validate.outputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push BigQuery Service
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./infrastructure/docker/Dockerfile.bigquery-service
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/bigquery-service:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/bigquery-service:${{ needs.validate.outputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Web3 Security
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./infrastructure/docker/Dockerfile.web3-security
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-security:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-security:${{ needs.validate.outputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Create image tags
+        run: |
+          echo "Creating image tags for deployment..."
+          echo "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-provider:${{ github.sha }}" > image-tags.txt
+          echo "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/bigquery-service:${{ github.sha }}" >> image-tags.txt
+          echo "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/web3-security:${{ github.sha }}" >> image-tags.txt
+
+      - name: Upload image tags
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-tags-${{ needs.validate.outputs.environment }}
+          path: image-tags.txt
+          retention-days: 30
+
+  performance-test:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: [terraform-apply]
+    if: needs.validate.outputs.should_deploy == 'true' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run k6 performance tests
+        uses: grafana/k6-action@v0.3.0
+        with:
+          filename: tests/performance/web3-load-test.js
+          flags: --out json=performance-results.json
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results-${{ needs.validate.outputs.environment }}
+          path: performance-results.json
+          retention-days: 30
+
+  cleanup:
+    name: Cleanup Artifacts
+    runs-on: ubuntu-latest
+    needs: [terraform-apply, docker-push]
+    if: always()
+
+    steps:
+      - name: Delete old artifacts
+        run: |
+          echo "Cleaning up old deployment artifacts..."
+          # Cleanup logic here

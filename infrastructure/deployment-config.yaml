@@ -1,0 +1,319 @@
+# Google Cloud Deployment Configuration för Felicia's Finance
+# Detta är huvudkonfigurationsfilen för deployment
+
+project:
+  id: "felicia-finance-prod"
+  region: "europe-west1"
+  zone: "europe-west1-b"
+
+# Google Cloud Services som ska aktiveras
+services:
+  - cloudbuild.googleapis.com
+  - run.googleapis.com
+  - container.googleapis.com
+  - bigquery.googleapis.com
+  - pubsub.googleapis.com
+  - cloudfunctions.googleapis.com
+  - aiplatform.googleapis.com
+  - kms.googleapis.com
+  - monitoring.googleapis.com
+  - logging.googleapis.com
+
+# Service Accounts
+service_accounts:
+  web3_provider:
+    name: "web3-provider-sa"
+    display_name: "Web3 Provider Service Account"
+    roles:
+      - "roles/bigquery.dataEditor"
+      - "roles/pubsub.publisher"
+      - "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+
+  bigquery_service:
+    name: "bigquery-service-sa"
+    display_name: "BigQuery Service Account"
+    roles:
+      - "roles/bigquery.admin"
+      - "roles/pubsub.subscriber"
+      - "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+
+  security_service:
+    name: "security-service-sa"
+    display_name: "Security Service Account"
+    roles:
+      - "roles/logging.logWriter"
+      - "roles/monitoring.metricWriter"
+      - "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+
+# Cloud Run Services
+cloud_run_services:
+  web3_provider:
+    service_name: "web3-provider"
+    image: "gcr.io/felicia-finance-prod/web3-provider:latest"
+    region: "europe-west1"
+    min_instances: 1
+    max_instances: 10
+    cpu: 1000m
+    memory: 2Gi
+    port: 8080
+    env_vars:
+      - name: "GOOGLE_CLOUD_PROJECT_ID"
+        value: "felicia-finance-prod"
+      - name: "WEB3_GATEWAY_ENABLED"
+        value: "true"
+      - name: "ENVIRONMENT"
+        value: "production"
+
+  bigquery_service:
+    service_name: "bigquery-service"
+    image: "gcr.io/felicia-finance-prod/bigquery-service:latest"
+    region: "europe-west1"
+    min_instances: 1
+    max_instances: 5
+    cpu: 2000m
+    memory: 4Gi
+    port: 8080
+    env_vars:
+      - name: "GOOGLE_CLOUD_PROJECT_ID"
+        value: "felicia-finance-prod"
+      - name: "BIGQUERY_DATASET_TRADING"
+        value: "trading_analytics"
+      - name: "BIGQUERY_DATASET_PORTFOLIO"
+        value: "portfolio_tracking"
+      - name: "ENVIRONMENT"
+        value: "production"
+
+  security_service:
+    service_name: "security-service"
+    image: "gcr.io/felicia-finance-prod/security-service:latest"
+    region: "europe-west1"
+    min_instances: 1
+    max_instances: 3
+    cpu: 500m
+    memory: 1Gi
+    port: 8080
+    env_vars:
+      - name: "GOOGLE_CLOUD_PROJECT_ID"
+        value: "felicia-finance-prod"
+      - name: "ENVIRONMENT"
+        value: "production"
+
+# BigQuery Datasets och Tables
+bigquery:
+  datasets:
+    trading_analytics:
+      description: "Trading analytics och portfolio data"
+      tables:
+        - name: "trades"
+          schema:
+            - name: "wallet_address"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "token_address"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "amount"
+              type: "FLOAT64"
+              mode: "REQUIRED"
+            - name: "price_usd"
+              type: "FLOAT64"
+            - name: "timestamp"
+              type: "TIMESTAMP"
+              mode: "REQUIRED"
+        - name: "portfolio_snapshots"
+          schema:
+            - name: "wallet_address"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "total_value_usd"
+              type: "FLOAT64"
+            - name: "risk_score"
+              type: "FLOAT64"
+            - name: "timestamp"
+              type: "TIMESTAMP"
+              mode: "REQUIRED"
+
+    portfolio_tracking:
+      description: "Portfolio tracking och performance data"
+      tables:
+        - name: "daily_balances"
+          schema:
+            - name: "wallet_address"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "token_symbol"
+              type: "STRING"
+            - name: "balance"
+              type: "FLOAT64"
+            - name: "value_usd"
+              type: "FLOAT64"
+            - name: "date"
+              type: "DATE"
+              mode: "REQUIRED"
+        - name: "performance_metrics"
+          schema:
+            - name: "wallet_address"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "metric_name"
+              type: "STRING"
+            - name: "metric_value"
+              type: "FLOAT64"
+            - name: "date"
+              type: "DATE"
+              mode: "REQUIRED"
+
+# Pub/Sub Topics
+pubsub:
+  topics:
+    - name: "crypto-trades"
+      message_retention_duration: "604800s"  # 7 dagar
+    - name: "price-updates"
+      message_retention_duration: "86400s"   # 1 dag
+    - name: "trading-alerts"
+      message_retention_duration: "2592000s" # 30 dagar
+
+  subscriptions:
+    crypto_trades_processor:
+      topic: "crypto-trades"
+      ack_deadline_seconds: 60
+      message_retention_duration: "604800s"
+    price_updates_processor:
+      topic: "price-updates"
+      ack_deadline_seconds: 30
+      message_retention_duration: "86400s"
+
+# KMS Key Rings och Keys
+kms:
+  key_rings:
+    felicia-keyring:
+      location: "europe-west1"
+      keys:
+        web3-signing-key:
+          purpose: "ASYMMETRIC_SIGN"
+          algorithm: "EC_SIGN_P256_SHA256"
+          protection_level: "SOFTWARE"
+        api-keys-key:
+          purpose: "ENCRYPT_DECRYPT"
+          algorithm: "GOOGLE_SYMMETRIC_ENCRYPTION"
+          protection_level: "SOFTWARE"
+
+# VPC Network
+vpc:
+  name: "felicia-finance-vpc"
+  auto_create_subnetworks: false
+  subnets:
+    - name: "web3-subnet"
+      region: "europe-west1"
+      ip_cidr_range: "10.0.1.0/24"
+      private_access: true
+    - name: "bigquery-subnet"
+      region: "europe-west1"
+      ip_cidr_range: "10.0.2.0/24"
+      private_access: true
+
+# Firewall Rules
+firewall:
+  rules:
+    allow_internal_traffic:
+      name: "allow-internal"
+      description: "Allow internal traffic between services"
+      source_ranges: ["10.0.0.0/8"]
+      allow:
+        - protocol: "tcp"
+          ports: ["8080", "8081", "5432", "6379"]
+        - protocol: "udp"
+          ports: ["53"]
+
+    allow_health_checks:
+      name: "allow-health-checks"
+      description: "Allow Google Cloud health checks"
+      source_ranges: ["130.211.0.0/22", "35.191.0.0/16"]
+      allow:
+        - protocol: "tcp"
+          ports: ["8080"]
+
+# Monitoring & Alerting
+monitoring:
+  dashboards:
+    felicia-finance-main:
+      display_name: "Felicia Finance Main Dashboard"
+
+  alert_policies:
+    high_error_rate:
+      display_name: "High Error Rate Alert"
+      condition_threshold:
+        filter: "metric.type=\"run.googleapis.com/request_count\" resource.type=\"cloud_run_revision\""
+        comparison: "COMPARISON_GT"
+        threshold_value: 10
+        duration: "300s"
+      notification_channels: ["email"]
+
+    high_latency:
+      display_name: "High Latency Alert"
+      condition_threshold:
+        filter: "metric.type=\"run.googleapis.com/request_latencies\" resource.type=\"cloud_run_revision\""
+        comparison: "COMPARISON_GT"
+        threshold_value: 1000
+        duration: "300s"
+      notification_channels: ["email"]
+
+# Load Balancer
+load_balancer:
+  name: "felicia-finance-lb"
+  frontend_name: "felicia-finance-frontend"
+  backend_services:
+    web3_provider_backend:
+      name: "web3-provider-backend"
+      protocol: "HTTP"
+      port_name: "http"
+      timeout_sec: 30
+      connection_draining_timeout_sec: 300
+    bigquery_service_backend:
+      name: "bigquery-service-backend"
+      protocol: "HTTP"
+      port_name: "http"
+      timeout_sec: 60
+      connection_draining_timeout_sec: 300
+
+# Domain & SSL
+domain:
+  name: "api.felicia-finance.com"
+  ssl_certificate: "felicia-finance-ssl-cert"
+  managed_zone: "felicia-finance-zone"
+
+# CI/CD
+ci_cd:
+  cloud_build:
+    trigger_name: "felicia-finance-ci-trigger"
+    branch_pattern: "^main$"
+    included_files:
+      - "crypto/**"
+      - "infrastructure/**"
+
+  cloud_deploy:
+    delivery_pipeline:
+      name: "felicia-finance-deployment"
+      targets:
+        - name: "staging"
+          region: "europe-west1"
+        - name: "production"
+          region: "europe-west1"
+
+# Backup Configuration
+backup:
+  bigquery_datasets:
+    - "trading_analytics"
+    - "portfolio_tracking"
+
+  cloud_storage_bucket: "felicia-finance-backups"
+  retention_days: 30
+
+# Performance Configuration
+performance:
+  cloud_run_concurrency: 1000
+  bigquery_max_query_size: 1000
+  cache_ttl_seconds: 3600
+  rate_limiting:
+    web3_provider_rpm: 10000
+    bigquery_service_rpm: 5000

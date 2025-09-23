@@ -1,0 +1,158 @@
+[
+  {
+    "name": "transaction_hash",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Unique transaction hash"
+  },
+  {
+    "name": "block_number",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Block number containing the transaction"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Transaction timestamp"
+  },
+  {
+    "name": "chain_id",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Blockchain network ID"
+  },
+  {
+    "name": "from_address",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Sender address"
+  },
+  {
+    "name": "to_address",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Recipient address"
+  },
+  {
+    "name": "value",
+    "type": "BIGNUMERIC",
+    "mode": "NULLABLE",
+    "description": "Transaction value in wei/smallest unit"
+  },
+  {
+    "name": "gas_price",
+    "type": "BIGNUMERIC",
+    "mode": "NULLABLE",
+    "description": "Gas price in wei"
+  },
+  {
+    "name": "gas_used",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Actual gas used"
+  },
+  {
+    "name": "status",
+    "type": "BOOLEAN",
+    "mode": "NULLABLE",
+    "description": "Transaction success status"
+  },
+  {
+    "name": "method_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Decoded method name if contract interaction"
+  },
+  {
+    "name": "contract_address",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Contract address if applicable"
+  },
+  {
+    "name": "token_address",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Token contract address for ERC20 transfers"
+  },
+  {
+    "name": "token_symbol",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Token symbol"
+  },
+  {
+    "name": "token_amount",
+    "type": "BIGNUMERIC",
+    "mode": "NULLABLE",
+    "description": "Amount of tokens transferred"
+  },
+  {
+    "name": "fee_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Transaction fee in USD"
+  },
+  {
+    "name": "value_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Transaction value in USD"
+  },
+  {
+    "name": "transaction_type",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Type of transaction (transfer, swap, mint, etc.)"
+  },
+  {
+    "name": "dex_protocol",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "DEX protocol used (uniswap, sushiswap, etc.)"
+  },
+  {
+    "name": "pool_address",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Liquidity pool address for DEX transactions"
+  },
+  {
+    "name": "raw_logs",
+    "type": "JSON",
+    "mode": "REPEATED",
+    "description": "Raw transaction logs"
+  },
+  {
+    "name": "error_message",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Error message if transaction failed"
+  },
+  {
+    "name": "confirmations",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of block confirmations"
+  },
+  {
+    "name": "nonce",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Transaction nonce"
+  },
+  {
+    "name": "created_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record creation timestamp"
+  },
+  {
+    "name": "updated_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record update timestamp"
+  }
+]

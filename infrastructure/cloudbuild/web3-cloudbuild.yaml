@@ -1,0 +1,370 @@
+# Google Cloud Build configuration for Web3 Integration
+# This file defines the CI/CD pipeline for automated building, testing, and deployment
+
+steps:
+  # Step 1: Validate configurations
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'validate-config'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Validating Terraform configuration..."
+        cd infrastructure/terraform
+        terraform init -backend=false
+        terraform validate
+
+        echo "Validating Dockerfiles..."
+        find . -name "Dockerfile*" -type f -exec docker build --dry-run -f {} . \;
+
+    waitFor: ['-']
+
+  # Step 2: Security scanning
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'security-scan'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running security scans..."
+
+        # Install security tools
+        apt-get update && apt-get install -y wget
+        wget -O trivy.tar.gz https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.45.1_Linux-64bit.tar.gz
+        tar -xzf trivy.tar.gz
+
+        # Scan Dockerfiles for vulnerabilities
+        find . -name "Dockerfile*" -type f | while read -r dockerfile; do
+          echo "Scanning $dockerfile..."
+          ./trivy config $dockerfile
+        done
+
+        # Scan filesystem for secrets
+        ./trivy fs --scanners secret .
+
+    waitFor: ['validate-config']
+
+  # Step 3: Build Docker images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-web3-provider'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-provider:$COMMIT_SHA'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-provider:latest'
+      - '-f'
+      - 'infrastructure/docker/Dockerfile.web3-provider'
+      - '.'
+
+    waitFor: ['security-scan']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-bigquery-service'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:$COMMIT_SHA'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:latest'
+      - '-f'
+      - 'infrastructure/docker/Dockerfile.bigquery-service'
+      - '.'
+
+    waitFor: ['security-scan']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-web3-security'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-security:$COMMIT_SHA'
+      - '-t'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-security:latest'
+      - '-f'
+      - 'infrastructure/docker/Dockerfile.web3-security'
+      - '.'
+
+    waitFor: ['security-scan']
+
+  # Step 4: Run tests
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'test-web3-provider'
+    args:
+      - 'run'
+      - '--rm'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-provider:$COMMIT_SHA'
+      - 'npm'
+      - 'test'
+
+    waitFor: ['build-web3-provider']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'test-bigquery-service'
+    args:
+      - 'run'
+      - '--rm'
+      - '$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:$COMMIT_SHA'
+      - 'python'
+      - '-m'
+      - 'pytest'
+      - 'tests/'
+
+    waitFor: ['build-bigquery-service']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'test-web3-security'
+    args:
+      - 'run'
+      - '--rm'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-security:$COMMIT_SHA'
+      - 'python'
+      - '-m'
+      - 'pytest'
+      - 'tests/security_tests.py'
+
+    waitFor: ['build-web3-security']
+
+  # Step 5: Push Docker images to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-web3-provider'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-provider:$COMMIT_SHA'
+
+    waitFor: ['test-web3-provider']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-bigquery-service'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:$COMMIT_SHA'
+
+    waitFor: ['test-bigquery-service']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-web3-security'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-security:$COMMIT_SHA'
+
+    waitFor: ['test-web3-security']
+
+  # Step 6: Push latest tags
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-web3-provider-latest'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-provider:latest'
+
+    waitFor: ['push-web3-provider']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-bigquery-service-latest'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:latest'
+
+    waitFor: ['push-bigquery-service']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-web3-security-latest'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$PROJECT_ID/web3-security:latest'
+
+    waitFor: ['push-web3-security']
+
+  # Step 7: Terraform deployment (conditional)
+  - name: 'hashicorp/terraform:1.5.0'
+    id: 'terraform-plan'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd infrastructure/terraform
+
+        # Create terraform.tfvars
+        cat > terraform.tfvars << EOF
+        project_id = "$PROJECT_ID"
+        region = "$_REGION"
+        environment = "$_ENVIRONMENT"
+        web3_provider_image = "$_AR_HOSTNAME/$PROJECT_ID/web3-provider:$COMMIT_SHA"
+        bigquery_service_image = "$_AR_HOSTNAME/$PROJECT_ID/bigquery-service:$COMMIT_SHA"
+        web3_security_image = "$_AR_HOSTNAME/$PROJECT_ID/web3-security:$COMMIT_SHA"
+        security_contact_email = "$_SECURITY_EMAIL"
+        pgp_public_key = "$_PGP_KEY"
+        EOF
+
+        terraform init
+        terraform plan -var-file=terraform.tfvars -out=tfplan
+
+        # Save plan to GCS for manual approval
+        gsutil cp tfplan gs://$_TF_BUCKET/tfplan-$BUILD_ID
+
+    waitFor: ['push-web3-provider-latest', 'push-bigquery-service-latest', 'push-web3-security-latest']
+    allowFailure: true
+
+  # Step 8: Performance testing
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'performance-test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running performance tests..."
+        # Install k6
+        sudo apt-get update
+        sudo apt-get install -y curl
+        curl -L https://github.com/grafana/k6/releases/download/v0.45.0/k6-v0.45.0-linux-amd64.tar.gz | tar -xz
+        sudo cp k6-v0.45.0-linux-amd64/k6 /usr/local/bin/
+
+        # Run performance tests
+        k6 run --out json=performance-results.json tests/performance/web3-load-test.js
+
+        # Upload results to BigQuery
+        bq load --source_format=NEWLINE_DELIMITED_JSON \
+               web3_analytics.performance_metrics \
+               performance-results.json \
+               tests/performance/schema.json
+
+    waitFor: ['terraform-plan']
+    allowFailure: true
+
+  # Step 9: Integration testing
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'integration-test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running integration tests..."
+        # Test Web3 Provider API
+        curl -X GET "${_WEB3_PROVIDER_URL}/health" \
+             -H "Authorization: Bearer ${_API_TOKEN}" \
+             -f || exit 1
+
+        # Test BigQuery Service API
+        curl -X GET "${_BIGQUERY_SERVICE_URL}/health" \
+             -H "Authorization: Bearer ${_API_TOKEN}" \
+             -f || exit 1
+
+        # Test blockchain connectivity
+        curl -X POST "${_WEB3_PROVIDER_URL}/api/v1/test-connection" \
+             -H "Authorization: Bearer ${_API_TOKEN}" \
+             -H "Content-Type: application/json" \
+             -d '{"chain_id": 1}' \
+             -f || exit 1
+
+        echo "All integration tests passed!"
+
+    waitFor: ['terraform-plan']
+
+  # Step 10: Cleanup old images (keep last 10)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'cleanup-images'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Cleaning up old images..."
+        gcloud artifacts docker images list \
+               $_AR_HOSTNAME/$PROJECT_ID/web3-provider \
+               --format="table[no-heading](version.digest)" \
+               --limit=100 \
+               --sort-by=~createTime | tail -n +11 | while read digest; do
+          gcloud artifacts docker images delete $_AR_HOSTNAME/$PROJECT_ID/web3-provider@$digest --quiet
+        done
+
+        gcloud artifacts docker images list \
+               $_AR_HOSTNAME/$PROJECT_ID/bigquery-service \
+               --format="table[no-heading](version.digest)" \
+               --limit=100 \
+               --sort-by=~createTime | tail -n +11 | while read digest; do
+          gcloud artifacts docker images delete $_AR_HOSTNAME/$PROJECT_ID/bigquery-service@$digest --quiet
+        done
+
+        gcloud artifacts docker images list \
+               $_AR_HOSTNAME/$PROJECT_ID/web3-security \
+               --format="table[no-heading](version.digest)" \
+               --limit=100 \
+               --sort-by=~createTime | tail -n +11 | while read digest; do
+          gcloud artifacts docker images delete $_AR_HOSTNAME/$PROJECT_ID/web3-security@$digest --quiet
+        done
+
+    waitFor: ['-']
+    allowFailure: true
+
+# Timeout for the entire build
+timeout: '3600s'
+
+# Substitutions available to all steps
+substitutions:
+  _REGION: 'us-central1'
+  _ENVIRONMENT: 'dev'
+  _AR_HOSTNAME: 'us-central1-docker.pkg.dev'
+  _TF_BUCKET: 'gs://web3-tf-state'
+  _SECURITY_EMAIL: '${_SECURITY_EMAIL}'
+  _PGP_KEY: '${_PGP_KEY}'
+  _API_TOKEN: '${_API_TOKEN}'
+  _WEB3_PROVIDER_URL: '${_WEB3_PROVIDER_URL}'
+  _BIGQUERY_SERVICE_URL: '${_BIGQUERY_SERVICE_URL}'
+
+# Artifacts to save
+artifacts:
+  objects:
+    location: 'gs://web3-build-artifacts/$PROJECT_ID/$BUILD_ID'
+    paths: ['performance-results.json']
+
+# Options
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: 'CLOUD_LOGGING_ONLY'
+  env:
+    - 'CGO_ENABLED=0'
+
+# Trigger configurations
+triggers:
+  # GitHub push trigger
+  - name: 'web3-github-trigger'
+    description: 'Trigger on GitHub pushes to main/develop'
+    github:
+      owner: '${_GITHUB_OWNER}'
+      name: '${_GITHUB_REPO}'
+      push:
+        branch: '^main$|^develop$'
+        invert_regex: false
+
+  # Manual trigger
+  - name: 'web3-manual-trigger'
+    description: 'Manual trigger for deployments'
+    trigger_template:
+      repoName: '${_GITHUB_REPO}'
+      branchName: '.*'
+    substitutions:
+      _ENVIRONMENT: 'prod'
+
+  # Schedule trigger for security scans
+  - name: 'web3-security-scan'
+    description: 'Daily security scan'
+    schedule:
+      cron: '0 2 * * *'  # Daily at 2 AM
+      timezone: 'UTC'
+    substitutions:
+      _ENVIRONMENT: 'security-scan'
+
+# Build timeout and resource allocation
+availableSecrets:
+  secretManager:
+    - versionName: 'projects/$PROJECT_ID/secrets/web3-api-token/versions/latest'
+      env: 'API_TOKEN'
+    - versionName: 'projects/$PROJECT_ID/secrets/security-contact-email/versions/latest'
+      env: 'SECURITY_EMAIL'
+    - versionName: 'projects/$PROJECT_ID/secrets/pgp-public-key/versions/latest'
+      env: 'PGP_KEY'
+
+# Logs configuration
+logsBucket: 'gs://web3-build-logs'
+
+# Service account for Cloud Build
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/web3-cloudbuild@$PROJECT_ID.iam.gserviceaccount.com'

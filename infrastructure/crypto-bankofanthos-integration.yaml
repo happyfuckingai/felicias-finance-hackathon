@@ -1,0 +1,555 @@
+# 🚀 Felicia's Finance - Bank of Anthos Integration
+# Integrerar crypto-systemet med befintlig Bank of Anthos infrastruktur
+
+# =============================================================================
+# SHARED DATABASE INTEGRATION
+# =============================================================================
+
+# PostgreSQL från Bank of Anthos används för:
+# - User accounts och authentication
+# - Transaction history
+# - Crypto wallet metadata
+# - Portfolio snapshots
+# - Risk calculations
+
+# Redis från Bank of Anthos används för:
+# - Session caching
+# - Token price caching
+# - Rate limiting
+# - Temporary data storage
+
+# =============================================================================
+# CRYPTO SERVICES INTEGRATION
+# =============================================================================
+
+# Web3 Provider Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: felicia-web3-provider
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: felicia-web3-provider
+  template:
+    metadata:
+      labels:
+        app: felicia-web3-provider
+        version: v1.0.0
+        component: crypto
+      annotations:
+        sidecar.istio.io/status: '{"version":"12345"}'
+    spec:
+      serviceAccountName: felicia-web3-sa
+      containers:
+      - name: web3-provider
+        image: gcr.io/felicia-finance-prod/web3-provider:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: GOOGLE_CLOUD_PROJECT_ID
+          value: "felicia-finance-prod"
+        - name: WEB3_GATEWAY_ENABLED
+          value: "true"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bankofanthos-db-secret
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bankofanthos-redis-secret
+              key: redis-url
+        - name: ENVIRONMENT
+          value: "production"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: felicia-web3-provider
+  namespace: default
+  labels:
+    app: felicia-web3-provider
+spec:
+  selector:
+    app: felicia-web3-provider
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: felicia-web3-provider
+  namespace: default
+spec:
+  hosts:
+  - "felicia-web3.felicia-finance.local"
+  gateways:
+  - bankofanthos-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/web3"
+    route:
+    - destination:
+        host: felicia-web3-provider
+        port:
+          number: 80
+---
+# BigQuery Analytics Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: felicia-bigquery-service
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: felicia-bigquery-service
+  template:
+    metadata:
+      labels:
+        app: felicia-bigquery-service
+        version: v1.0.0
+        component: analytics
+      annotations:
+        sidecar.istio.io/status: '{"version":"12345"}'
+    spec:
+      serviceAccountName: felicia-bigquery-sa
+      containers:
+      - name: bigquery-service
+        image: gcr.io/felicia-finance-prod/bigquery-service:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: GOOGLE_CLOUD_PROJECT_ID
+          value: "felicia-finance-prod"
+        - name: BIGQUERY_DATASET_TRADING
+          value: "trading_analytics"
+        - name: BIGQUERY_DATASET_PORTFOLIO
+          value: "portfolio_tracking"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bankofanthos-db-secret
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bankofanthos-redis-secret
+              key: redis-url
+        - name: BANK_OF_ANTHOS_API_URL
+          value: "http://accounts-service:8080"
+        - name: ENVIRONMENT
+          value: "production"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: felicia-bigquery-service
+  namespace: default
+  labels:
+    app: felicia-bigquery-service
+spec:
+  selector:
+    app: felicia-bigquery-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: felicia-bigquery-service
+  namespace: default
+spec:
+  hosts:
+  - "felicia-analytics.felicia-finance.local"
+  gateways:
+  - bankofanthos-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/analytics"
+    route:
+    - destination:
+        host: felicia-bigquery-service
+        port:
+          number: 80
+---
+# Security Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: felicia-security-service
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: felicia-security-service
+  template:
+    metadata:
+      labels:
+        app: felicia-security-service
+        version: v1.0.0
+        component: security
+      annotations:
+        sidecar.istio.io/status: '{"version":"12345"}'
+    spec:
+      serviceAccountName: felicia-security-sa
+      containers:
+      - name: security-service
+        image: gcr.io/felicia-finance-prod/security-service:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: GOOGLE_CLOUD_PROJECT_ID
+          value: "felicia-finance-prod"
+        - name: KMS_KEYRING
+          value: "felicia-keyring"
+        - name: BANK_OF_ANTHOS_USERS_API
+          value: "http://accounts-service:8080/v1/users"
+        - name: ENVIRONMENT
+          value: "production"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: felicia-security-service
+  namespace: default
+  labels:
+    app: felicia-security-service
+spec:
+  selector:
+    app: felicia-security-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
+---
+
+# =============================================================================
+# INTEGRATION CONFIGMAPS
+# =============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: felicia-crypto-config
+  namespace: default
+data:
+  # Bank of Anthos integration settings
+  bankofanthos:
+    accounts_service_url: "http://accounts-service:8080"
+    transactions_service_url: "http://transactions-service:8080"
+    ledger_service_url: "http://ledger-service:8080"
+    database_shared: "true"
+    redis_shared: "true"
+
+  # Crypto-specific settings
+  crypto:
+    supported_chains: "ethereum,polygon,arbitrum,optimism,base"
+    web3_gateway_enabled: "true"
+    bigquery_analytics_enabled: "true"
+    portfolio_tracking_enabled: "true"
+
+  # Security settings
+  security:
+    kms_enabled: "true"
+    multi_sig_enabled: "true"
+    access_control_enabled: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: felicia-service-mesh-config
+  namespace: default
+data:
+  # Service mesh integration
+  mesh:
+    enabled: "true"
+    gateway: "bankofanthos-gateway"
+    virtual_services: "felicia-web3-provider,felicia-bigquery-service"
+
+  # Traffic management
+  traffic:
+    web3_provider_weight: "100"
+    bigquery_service_weight: "100"
+    security_service_weight: "100"
+
+  # Security policies
+  policies:
+    mTLS: "strict"
+    authorization: "enabled"
+    rate_limiting: "enabled"
+---
+
+# =============================================================================
+# SERVICE ACCOUNTS WITH INTEGRATION PERMISSIONS
+# =============================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: felicia-web3-sa
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: "felicia-web3@$PROJECT_ID.iam.gserviceaccount.com"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: felicia-bigquery-sa
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: "felicia-bigquery@$PROJECT_ID.iam.gserviceaccount.com"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: felicia-security-sa
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: "felicia-security@$PROJECT_ID.iam.gserviceaccount.com"
+---
+
+# =============================================================================
+# NETWORK POLICIES FOR INTEGRATION
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: felicia-crypto-integration
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      component: crypto
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: accounts-service
+    - podSelector:
+        matchLabels:
+          app: transactions-service
+    - podSelector:
+        matchLabels:
+          app: ledger-service
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: accounts-service
+    - podSelector:
+        matchLabels:
+          app: transactions-service
+    - podSelector:
+        matchLabels:
+          app: ledger-service
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+    - protocol: TCP
+      port: 8080  # Bank of Anthos services
+---
+
+# =============================================================================
+# HORIZONTAL POD AUTOSCALER
+# =============================================================================
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: felicia-web3-provider-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: felicia-web3-provider
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: felicia-bigquery-service-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: felicia-bigquery-service
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+
+# =============================================================================
+# MONITORING INTEGRATION
+# =============================================================================
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: felicia-crypto-services
+  namespace: default
+  labels:
+    app: felicia-finance
+spec:
+  selector:
+    matchLabels:
+      component: crypto
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - default
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: felicia-security-services
+  namespace: default
+  labels:
+    app: felicia-finance
+spec:
+  selector:
+    matchLabels:
+      component: security
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - default
+---
+
+# =============================================================================
+# NOTES FOR DEPLOYMENT
+# =============================================================================
+
+# Deployment Order:
+# 1. Deploya Bank of Anthos foundation först
+# 2. Deploya crypto services
+# 3. Konfigurera integrationer
+# 4. Testa end-to-end integration
+
+# Shared Resources:
+# - PostgreSQL: User accounts, transactions, crypto metadata
+# - Redis: Caching, sessions, rate limiting
+# - Service Mesh: Traffic management, security
+# - Monitoring: Unified observability
+
+# Integration Points:
+# - Felicia Web3 Provider ↔ Bank of Anthos accounts
+# - Felicia Analytics ↔ Bank of Anthos transactions
+# - Felicia Security ↔ Bank of Anthos ledger
+# - Shared database för cross-system data

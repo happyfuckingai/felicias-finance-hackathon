@@ -1,0 +1,176 @@
+gcp:
+  project_id: "felicia-finance-adk"
+  region: "us-central1"
+  zone: "us-central1-a"
+  service_account: "felicia-adk-sa@felicia-finance-adk.iam.gserviceaccount.com"
+
+  # Google Cloud Web3 Integration
+  web3_integration:
+    enabled: true
+    gateway_endpoint: "https://felicia-finance-adk-web3-gateway.web3.gateway.dev"
+    supported_chains:
+      - "ethereum"
+      - "polygon"
+      - "arbitrum"
+      - "optimism"
+      - "base"
+      - "bsc"
+
+  # BigQuery Configuration
+  bigquery:
+    datasets:
+      trading_analytics: "trading_analytics"
+      portfolio_tracking: "portfolio_tracking"
+      risk_metrics: "risk_metrics"
+      market_data: "market_data"
+    location: "US"
+    query_timeout: 300
+    max_bytes_billed: 1000000000
+
+  # Pub/Sub Configuration
+  pubsub:
+    topics:
+      crypto_trades: "crypto-trades"
+      price_updates: "price-updates"
+      trading_alerts: "trading-alerts"
+    subscriptions:
+      crypto_trades_processor: "crypto-trades-processor"
+
+  # Cloud Storage Configuration
+  storage:
+    buckets:
+      ml_models: "felicia-finance-adk-ml-models"
+      trading_data: "felicia-finance-adk-trading-data"
+      backups: "felicia-finance-adk-backups"
+
+  # Vertex AI Configuration
+  vertex_ai:
+    endpoints:
+      trading_predictor: "projects/felicia-finance-adk/locations/us-central1/endpoints/trading-predictor"
+    models:
+      sentiment_analysis: "text-bison@001"
+      price_prediction: "gemini-pro"
+
+  # Cloud Functions Configuration
+  cloud_functions:
+    dex_oracle: "dex-oracle"
+    market_data_processor: "market-data-processor"
+    notification_sender: "notification-sender"
+
+  # Cloud Run Configuration
+  cloud_run:
+    services:
+      crypto_trading_bot: "crypto-trading-bot"
+      trading_analytics: "trading-analytics"
+      risk_management: "risk-management"
+
+  # KMS Configuration
+  kms:
+    keyring: "crypto-trading-keyring"
+    keys:
+      private_keys: "private-keys-key"
+      api_keys: "api-keys-key"
+
+  # Service Accounts for Different Components
+  service_accounts:
+    trading_bot: "trading-bot@felicia-finance-adk.iam.gserviceaccount.com"
+    analytics_service: "analytics-service@felicia-finance-adk.iam.gserviceaccount.com"
+    monitoring_service: "monitoring-service@felicia-finance-adk.iam.gserviceaccount.com"
+    dex_oracle: "dex-oracle@felicia-finance-adk.iam.gserviceaccount.com"
+    market_data_processor: "market-data-processor@felicia-finance-adk.iam.gserviceaccount.com"
+    notification_service: "notification-service@felicia-finance-adk.iam.gserviceaccount.com"
+
+  # Rate Limiting
+  rate_limits:
+    bigquery_queries_per_minute: 100
+    web3_gateway_calls_per_second: 10
+    vertex_ai_calls_per_minute: 60
+
+  # Performance Configuration
+  performance:
+    bigquery_batch_size: 1000
+    cache_ttl_seconds: 3600
+    connection_pool_size: 10
+
+adk:
+  agent_name: "felicia_orchestrator"
+  description: "Multi-agent orchestrator for Felicia Finance"
+  version: "1.0.0"
+
+agents:
+  # Bank side - Simple single-purpose agent (like a bank teller)
+  banking_agent:
+    name: "banking_agent"
+    type: "mcp_server"
+    endpoint: "http://localhost:8001"
+    capabilities:
+      - "account_management"
+      - "transaction_processing"
+      - "balance_inquiry"
+    communication_style: "direct"  # Simple point-to-point communication
+
+  # Crypto side - Complete investment bank team (MetaGPT-inspired)
+  crypto_investment_bank:
+    name: "crypto_investment_bank"
+    type: "multi_agent_team"
+    endpoint: "http://localhost:8000"
+    capabilities:
+      - "investment_strategy"
+      - "trading_execution"
+      - "risk_management"
+      - "portfolio_analysis"
+      - "market_research"
+    communication_style: "orchestrated"  # Complex multi-agent coordination
+    team_members:
+      - name: "product_manager"
+        role: "strategy_definition"
+      - name: "architect"
+        role: "technical_design"
+      - name: "engineer"
+        role: "implementation"
+      - name: "qa_specialist"
+        role: "validation"
+      - name: "coordinator"
+        role: "orchestration"
+
+workflows:
+  - name: "financial_analysis"
+    steps:
+      - agent: "banking_agent"
+        action: "get_balance"
+      - agent: "crypto_investment_bank"
+        action: "analyze_portfolio"
+      - agent: "felicia_orchestrator"
+        action: "generate_insights"
+
+  - name: "investment_strategy_workflow"
+    description: "Orchestrated workflow for crypto investment bank team"
+    steps:
+      - agent: "crypto_investment_bank"
+        action: "receive_mission"
+        parameters:
+          target_team_member: "coordinator"
+      - agent: "crypto_investment_bank"
+        action: "strategy_planning"
+        parameters:
+          target_team_member: "product_manager"
+      - agent: "crypto_investment_bank"
+        action: "technical_design"
+        parameters:
+          target_team_member: "architect"
+      - agent: "crypto_investment_bank"
+        action: "implementation"
+        parameters:
+          target_team_member: "engineer"
+      - agent: "crypto_investment_bank"
+        action: "quality_assurance"
+        parameters:
+          target_team_member: "qa_specialist"
+      - agent: "crypto_investment_bank"
+        action: "final_report"
+        parameters:
+          target_team_member: "coordinator"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

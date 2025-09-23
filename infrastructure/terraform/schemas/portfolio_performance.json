@@ -1,0 +1,278 @@
+[
+  {
+    "name": "portfolio_id",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Unique portfolio identifier"
+  },
+  {
+    "name": "strategy",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Trading strategy name"
+  },
+  {
+    "name": "date",
+    "type": "DATE",
+    "mode": "REQUIRED",
+    "description": "Performance date"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Performance calculation timestamp"
+  },
+  {
+    "name": "total_value_usd",
+    "type": "FLOAT",
+    "mode": "REQUIRED",
+    "description": "Total portfolio value in USD"
+  },
+  {
+    "name": "day_change_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Daily change in USD"
+  },
+  {
+    "name": "day_change_percent",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Daily change percentage"
+  },
+  {
+    "name": "total_return_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total return since inception in USD"
+  },
+  {
+    "name": "total_return_percent",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total return percentage since inception"
+  },
+  {
+    "name": "benchmark_return_percent",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Benchmark return percentage"
+  },
+  {
+    "name": "alpha",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Alpha (excess return over benchmark)"
+  },
+  {
+    "name": "beta",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Beta (volatility relative to benchmark)"
+  },
+  {
+    "name": "sharpe_ratio",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Sharpe ratio (risk-adjusted return)"
+  },
+  {
+    "name": "sortino_ratio",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Sortino ratio (downside deviation adjusted)"
+  },
+  {
+    "name": "max_drawdown",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Maximum drawdown percentage"
+  },
+  {
+    "name": "volatility_30d",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "30-day volatility"
+  },
+  {
+    "name": "var_95",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "95% Value at Risk"
+  },
+  {
+    "name": "var_99",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "99% Value at Risk"
+  },
+  {
+    "name": "win_rate",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Percentage of winning trades"
+  },
+  {
+    "name": "profit_factor",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Gross profit / Gross loss ratio"
+  },
+  {
+    "name": "avg_trade_return",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Average return per trade"
+  },
+  {
+    "name": "total_trades",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Total number of trades"
+  },
+  {
+    "name": "winning_trades",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of winning trades"
+  },
+  {
+    "name": "losing_trades",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of losing trades"
+  },
+  {
+    "name": "largest_win",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Largest winning trade in USD"
+  },
+  {
+    "name": "largest_loss",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Largest losing trade in USD"
+  },
+  {
+    "name": "avg_win",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Average winning trade in USD"
+  },
+  {
+    "name": "avg_loss",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Average losing trade in USD"
+  },
+  {
+    "name": "position_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of current positions"
+  },
+  {
+    "name": "cash_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Cash allocation percentage"
+  },
+  {
+    "name": "equity_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Equity allocation percentage"
+  },
+  {
+    "name": "crypto_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Cryptocurrency allocation percentage"
+  },
+  {
+    "name": "defi_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "DeFi allocation percentage"
+  },
+  {
+    "name": "nft_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "NFT allocation percentage"
+  },
+  {
+    "name": "gas_cost_total",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total gas costs in USD"
+  },
+  {
+    "name": "transaction_fees",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total transaction fees in USD"
+  },
+  {
+    "name": "performance_fee",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Performance fee charged"
+  },
+  {
+    "name": "management_fee",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Management fee charged"
+  },
+  {
+    "name": "net_performance_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Net performance after fees"
+  },
+  {
+    "name": "high_water_mark",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "High water mark for performance fees"
+  },
+  {
+    "name": "benchmark_index",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Benchmark index used for comparison"
+  },
+  {
+    "name": "risk_metrics",
+    "type": "JSON",
+    "mode": "NULLABLE",
+    "description": "Additional risk metrics JSON"
+  },
+  {
+    "name": "position_details",
+    "type": "JSON",
+    "mode": "REPEATED",
+    "description": "Detailed position information"
+  },
+  {
+    "name": "strategy_params",
+    "type": "JSON",
+    "mode": "NULLABLE",
+    "description": "Strategy parameters used"
+  },
+  {
+    "name": "created_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record creation timestamp"
+  },
+  {
+    "name": "updated_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record update timestamp"
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/mr"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "list_allowed_directories",
+        "list_directory",
+        "read_file"
+      ]
+    },
+    "crypto": {
+      "type": "crypto",
+      "name": "Crypto Trading & Risk Management Server",
+      "cache_tools_list": true,
+      "disabled": false
+    }
+  },
+  "servers": [
+    {
+      "type": "crypto",
+      "name": "Crypto Trading & Risk Management Server",
+      "cache_tools_list": true
+    }
+  ]
+}

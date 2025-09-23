@@ -1,0 +1,486 @@
+# Web3 Integration Configuration för Google Cloud ADK
+# Specifik konfiguration för blockchain och Web3-integrationer
+
+gcp:
+  project_id: "felicia-finance-adk"
+  region: "us-central1"
+  service_account: "felicia-web3-sa@felicia-finance-adk.iam.gserviceaccount.com"
+  zone: "us-central1-a"
+
+# Web3 och Blockchain konfiguration
+web3:
+  # Blockchain nätverk endpoints
+  networks:
+    ethereum:
+      mainnet:
+        rpc_url: "https://mainnet.infura.io/v3/YOUR_INFURA_KEY"
+        chain_id: 1
+        block_explorer: "https://etherscan.io"
+        confirmations_required: 12
+        gas_price_strategy: "fast"
+      sepolia:
+        rpc_url: "https://sepolia.infura.io/v3/YOUR_INFURA_KEY"
+        chain_id: 11155111
+        block_explorer: "https://sepolia.etherscan.io"
+        confirmations_required: 6
+        gas_price_strategy: "standard"
+
+    polygon:
+      mainnet:
+        rpc_url: "https://polygon-rpc.com"
+        chain_id: 137
+        block_explorer: "https://polygonscan.com"
+        confirmations_required: 32
+        gas_price_strategy: "fast"
+      mumbai:
+        rpc_url: "https://rpc-mumbai.maticvigil.com"
+        chain_id: 80001
+        block_explorer: "https://mumbai.polygonscan.com"
+        confirmations_required: 10
+        gas_price_strategy: "standard"
+
+    bsc:
+      mainnet:
+        rpc_url: "https://bsc-dataseed.binance.org"
+        chain_id: 56
+        block_explorer: "https://bscscan.com"
+        confirmations_required: 15
+        gas_price_strategy: "fast"
+
+    arbitrum:
+      mainnet:
+        rpc_url: "https://arb1.arbitrum.io/rpc"
+        chain_id: 42161
+        block_explorer: "https://arbiscan.io"
+        confirmations_required: 12
+        gas_price_strategy: "fast"
+
+  # Web3 Provider konfiguration
+  providers:
+    infura:
+      project_id: "YOUR_INFURA_PROJECT_ID"
+      project_secret: "YOUR_INFURA_PROJECT_SECRET"
+      rate_limit_per_second: 100
+      timeout: 30
+
+    alchemy:
+      api_key: "YOUR_ALCHEMY_API_KEY"
+      rate_limit_per_second: 300
+      timeout: 30
+
+    quicknode:
+      endpoint_url: "YOUR_QUICKNODE_ENDPOINT"
+      rate_limit_per_second: 500
+      timeout: 30
+
+  # Wallet konfiguration
+  wallets:
+    hot_wallet:
+      type: "web3py"
+      key_management: "google_kms"
+      kms_key_path: "projects/felicia-finance-adk/locations/global/keyRings/felicia-keyring/cryptoKeys/web3-hot-wallet"
+      chain_preferences: ["ethereum", "polygon", "bsc"]
+      gas_limit_multiplier: 1.2
+      max_gas_price_gwei: 100
+
+    cold_wallet:
+      type: "hardware"
+      key_management: "offline"
+      chain_preferences: ["ethereum", "polygon"]
+      requires_manual_approval: true
+      approval_threshold: 10000  # USD
+
+# DEX och DeFi integration
+dex:
+  # DEX API endpoints
+  apis:
+    uniswap_v3:
+      graph_url: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3"
+      timeout: 30
+      rate_limit_per_minute: 100
+
+    uniswap_v2:
+      graph_url: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
+      timeout: 30
+      rate_limit_per_minute: 100
+
+    sushiswap:
+      graph_url: "https://api.thegraph.com/subgraphs/name/sushiswap/exchange"
+      timeout: 30
+      rate_limit_per_minute: 100
+
+    pancakeswap:
+      api_url: "https://api.pancakeswap.info/api/v2"
+      timeout: 30
+      rate_limit_per_minute: 60
+
+    dex_screener:
+      api_url: "https://api.dexscreener.com/latest/dex"
+      timeout: 30
+      rate_limit_per_minute: 300
+
+  # DEX Oracle konfiguration
+  oracle:
+    update_interval_seconds: 60
+    max_price_deviation_percent: 5.0
+    min_liquidity_usd: 10000
+    confidence_threshold: 0.8
+    sources:
+      - name: "uniswap_v3"
+        weight: 0.4
+        enabled: true
+      - name: "dexscreener"
+        weight: 0.3
+        enabled: true
+      - name: "coingecko"
+        weight: 0.2
+        enabled: true
+      - name: "coinmarketcap"
+        weight: 0.1
+        enabled: false  # Requires API key
+
+  # Liquidity Pool konfiguration
+  liquidity_pools:
+    min_liquidity_usd: 50000
+    max_slippage_percent: 0.5
+    preferred_pairs:
+      - "WETH/USDC"
+      - "WETH/USDT"
+      - "WETH/DAI"
+      - "WMATIC/USDC"
+      - "WBNB/BUSD"
+
+# AI och ML integration
+vertex_ai:
+  # Vertex AI konfiguration
+  project_id: "felicia-finance-adk"
+  region: "us-central1"
+  endpoints:
+    price_prediction:
+      endpoint_id: "crypto_price_prediction"
+      model_name: "crypto_price_model"
+      version: "v1"
+      timeout: 60
+
+    risk_assessment:
+      endpoint_id: "crypto_risk_assessment"
+      model_name: "crypto_risk_model"
+      version: "v1"
+      timeout: 45
+
+    sentiment_analysis:
+      endpoint_id: "crypto_sentiment_analysis"
+      model_name: "crypto_sentiment_model"
+      version: "v1"
+      timeout: 30
+
+  # Model features
+  features:
+    price_prediction:
+      input_features:
+        - "price"
+        - "volume_24h"
+        - "market_cap"
+        - "price_change_24h"
+        - "social_volume"
+        - "sentiment_score"
+      output_features:
+        - "predicted_price_24h"
+        - "predicted_price_7d"
+        - "confidence_score"
+
+    risk_assessment:
+      input_features:
+        - "token_age"
+        - "liquidity"
+        - "volume_24h"
+        - "price_volatility"
+        - "social_sentiment"
+        - "audit_status"
+      output_features:
+        - "risk_score"
+        - "risk_level"
+        - "recommendation"
+
+# Google Cloud KMS konfiguration
+kms:
+  key_rings:
+    felicia-keyring:
+      location: "global"
+      keys:
+        web3-signing-key:
+          purpose: "ASYMMETRIC_SIGN"
+          algorithm: "EC_SIGN_P256_SHA256"
+          protection_level: "HSM"
+
+        web3-encryption-key:
+          purpose: "ENCRYPT_DECRYPT"
+          algorithm: "GOOGLE_SYMMETRIC_ENCRYPTION"
+          protection_level: "HSM"
+
+  # Key rotation policy
+  rotation:
+    interval_days: 90
+    auto_rotate: true
+    backup_enabled: true
+
+# Pub/Sub konfiguration för real-time data
+pubsub:
+  topics:
+    crypto_price_updates:
+      name: "crypto-price-updates"
+      message_retention_days: 7
+      enable_message_ordering: false
+      subscriptions:
+        price_analyzer:
+          ack_deadline_seconds: 60
+          message_retention_days: 7
+          retry_policy:
+            minimum_backoff: "1s"
+            maximum_backoff: "60s"
+
+        trading_engine:
+          ack_deadline_seconds: 30
+          message_retention_days: 1
+          retry_policy:
+            minimum_backoff: "0.1s"
+            maximum_backoff: "10s"
+
+    token_analysis_results:
+      name: "token-analysis-results"
+      message_retention_days: 30
+      enable_message_ordering: true
+      subscriptions:
+        dashboard_updater:
+          ack_deadline_seconds: 60
+          message_retention_days: 30
+
+# BigQuery konfiguration för data warehousing
+bigquery:
+  dataset_name: "crypto_web3_data"
+  location: "US"
+
+  tables:
+    dex_price_data:
+      schema:
+        - name: "token_symbol"
+          type: "STRING"
+          mode: "REQUIRED"
+        - name: "token_address"
+          type: "STRING"
+          mode: "REQUIRED"
+        - name: "dex_name"
+          type: "STRING"
+          mode: "REQUIRED"
+        - name: "price"
+          type: "FLOAT"
+          mode: "REQUIRED"
+        - name: "volume_24h"
+          type: "FLOAT"
+          mode: "NULLABLE"
+        - name: "price_change_24h"
+          type: "FLOAT"
+          mode: "NULLABLE"
+        - name: "liquidity"
+          type: "FLOAT"
+          mode: "NULLABLE"
+        - name: "timestamp"
+          type: "TIMESTAMP"
+          mode: "REQUIRED"
+
+    token_analysis:
+      schema:
+        - name: "token_symbol"
+          type: "STRING"
+          mode: "REQUIRED"
+        - name: "analysis_timestamp"
+          type: "TIMESTAMP"
+          mode: "REQUIRED"
+        - name: "sentiment_score"
+          type: "FLOAT"
+          mode: "NULLABLE"
+        - name: "risk_assessment"
+          type: "STRING"
+          mode: "NULLABLE"
+        - name: "ai_insights"
+          type: "STRING"
+          mode: "REPEATED"
+        - name: "confidence_score"
+          type: "FLOAT"
+          mode: "NULLABLE"
+
+# Cloud Functions konfiguration
+cloud_functions:
+  # DEX Oracle function
+  dex_oracle:
+    name: "dex-oracle-function"
+    runtime: "python39"
+    memory: "1Gi"
+    timeout_seconds: 540
+    max_instances: 10
+    environment_variables:
+      PROJECT_ID: "felicia-finance-adk"
+      UPDATE_INTERVAL: "60"
+      ENABLE_STREAMING: "true"
+    triggers:
+      - type: "http"
+        methods: ["GET", "POST"]
+
+  # Token Analysis function
+  token_analyzer:
+    name: "token-analyzer-function"
+    runtime: "python39"
+    memory: "2Gi"
+    timeout_seconds: 900
+    max_instances: 5
+    environment_variables:
+      PROJECT_ID: "felicia-finance-adk"
+      VERTEX_AI_REGION: "us-central1"
+      ENABLE_AI_ENHANCEMENT: "true"
+    triggers:
+      - type: "pubsub"
+        topic: "crypto-price-updates"
+
+  # Web3 Bridge function
+  web3_bridge:
+    name: "web3-bridge-function"
+    runtime: "python39"
+    memory: "512Mi"
+    timeout_seconds: 300
+    max_instances: 20
+    environment_variables:
+      PROJECT_ID: "felicia-finance-adk"
+      KMS_KEY_PATH: "projects/felicia-finance-adk/locations/global/keyRings/felicia-keyring/cryptoKeys/web3-signing-key"
+      ENABLE_AUTH_TRANSLATION: "true"
+    triggers:
+      - type: "http"
+        methods: ["POST"]
+
+# Security och IAM konfiguration
+security:
+  # Service Accounts
+  service_accounts:
+    web3_bridge_sa:
+      display_name: "Web3 Bridge Service Account"
+      roles:
+        - "roles/cloudkms.signerVerifier"
+        - "roles/pubsub.publisher"
+        - "roles/pubsub.subscriber"
+        - "roles/bigquery.dataEditor"
+
+    dex_oracle_sa:
+      display_name: "DEX Oracle Service Account"
+      roles:
+        - "roles/pubsub.publisher"
+        - "roles/pubsub.subscriber"
+        - "roles/firestore.user"
+        - "roles/bigquery.dataEditor"
+
+    vertex_ai_sa:
+      display_name: "Vertex AI Service Account"
+      roles:
+        - "roles/aiplatform.user"
+        - "roles/bigquery.dataViewer"
+        - "roles/storage.objectViewer"
+
+  # Firewall regler
+  firewall_rules:
+    web3_api_access:
+      name: "allow-web3-api-access"
+      source_ranges: ["0.0.0.0/0"]
+      allowed_ports: ["80", "443"]
+      description: "Allow access to Web3 API endpoints"
+
+# Monitoring och Alerting
+monitoring:
+  # Cloud Monitoring dashboards
+  dashboards:
+    web3_integration:
+      name: "Web3 Integration Dashboard"
+      widgets:
+        - type: "line_chart"
+          title: "DEX Price Updates"
+          metrics: ["pubsub.googleapis.com/subscription/num_undelivered_messages"]
+
+        - type: "line_chart"
+          title: "Token Analysis Requests"
+          metrics: ["cloudfunctions.googleapis.com/function/execution_count"]
+
+        - type: "line_chart"
+          title: "KMS Operations"
+          metrics: ["cloudkms.googleapis.com/crypto_key/operation_count"]
+
+  # Alerting policies
+  alerting:
+    dex_oracle_stalled:
+      name: "DEX Oracle Stalled"
+      condition:
+        metric: "custom.googleapis.com/dex_oracle/price_updates"
+        threshold: 0
+        duration: "300s"
+      notification_channels: ["email", "slack"]
+
+    high_error_rate:
+      name: "High Web3 Error Rate"
+      condition:
+        metric: "custom.googleapis.com/web3_bridge/error_count"
+        threshold: 10
+        duration: "60s"
+      notification_channels: ["email", "pagerduty"]
+
+# Logging konfiguration
+logging:
+  # Cloud Logging konfiguration
+  sinks:
+    bigquery_export:
+      name: "web3-logs-to-bigquery"
+      destination: "bigquery.googleapis.com/projects/felicia-finance-adk/datasets/crypto_logs"
+      filter: "resource.type=\"cloud_function\" AND resource.labels.function_name:dex-oracle-*"
+      include_children: true
+
+  # Log levels
+  levels:
+    crypto.core.integrations: "INFO"
+    web3.bridge: "DEBUG"
+    dex.oracle: "INFO"
+    vertex.ai: "INFO"
+
+# Deployment konfiguration
+deployment:
+  # Cloud Run konfiguration
+  cloud_run:
+    web3_bridge_service:
+      name: "web3-bridge-service"
+      image: "gcr.io/felicia-finance-adk/web3-bridge:latest"
+      memory: "1Gi"
+      cpu: "1"
+      max_instances: 10
+      environment_variables:
+        PROJECT_ID: "felicia-finance-adk"
+        LOG_LEVEL: "INFO"
+
+    dex_oracle_service:
+      name: "dex-oracle-service"
+      image: "gcr.io/felicia-finance-adk/dex-oracle:latest"
+      memory: "2Gi"
+      cpu: "2"
+      max_instances: 5
+      environment_variables:
+        PROJECT_ID: "felicia-finance-adk"
+        UPDATE_INTERVAL: "60"
+
+    vertex_analyzer_service:
+      name: "vertex-analyzer-service"
+      image: "gcr.io/felicia-finance-adk/vertex-analyzer:latest"
+      memory: "4Gi"
+      cpu: "4"
+      max_instances: 3
+      environment_variables:
+        PROJECT_ID: "felicia-finance-adk"
+        VERTEX_AI_REGION: "us-central1"
+
+  # Artifact Registry
+  artifact_registry:
+    repository_name: "felicia-web3-repo"
+    location: "us-central1"
+    description: "Repository for Web3 integration container images"

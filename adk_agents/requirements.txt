@@ -1,0 +1,28 @@
+# Google Cloud Web3 Integration
+google-cloud-web3==1.0.0          # Google Cloud Web3 Gateway
+google-cloud-bigquery==3.13.0     # BigQuery for analytics
+google-cloud-pubsub==2.18.0       # Real-time data streaming
+google-cloud-firestore==2.13.0    # NoSQL database for cache
+google-cloud-kms==2.20.0         # Key management
+google-cloud-monitoring==2.16.0  # Monitoring and alerting
+google-cloud-logging==3.8.0      # Logging
+google-cloud-aiplatform==1.38.0  # Vertex AI for ML
+google-cloud-functions==1.14.0   # Cloud Functions for serverless
+google-cloud-run==0.10.0         # Cloud Run for containerized services
+google-cloud-build==3.18.0       # Cloud Build for CI/CD
+google-cloud-storage==2.10.0     # Cloud Storage for data
+google-auth==2.23.0              # Google Cloud authentication
+google-cloud-artifact-registry==1.9.0  # Artifact Registry for containers
+google-cloud-resource-manager>=1.8.0  # Resource Manager
+
+# Core Dependencies
+pydantic>=2.0.0
+httpx>=0.24.0
+tenacity>=8.0.0
+protobuf>=3.20.0
+PyYAML>=6.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0fastapi>=0.100.0
+gunicorn>=20.1.0

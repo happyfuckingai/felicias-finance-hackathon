@@ -1,0 +1,649 @@
+# Google Cloud Monitoring Alert Policies for Web3 Integration
+# This file defines comprehensive alerting for all Web3 services
+
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-high-cpu-utilization
+  namespace: config-control
+spec:
+  displayName: "Web3 High CPU Utilization"
+  documentation:
+    content: "Alert when CPU utilization exceeds 80% for Web3 services"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider CPU High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/cpu/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 80
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  - displayName: "BigQuery Service CPU High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/cpu/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 80
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  - displayName: "Web3 Security CPU High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/cpu/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-security"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 80
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-high-memory-utilization
+  namespace: config-control
+spec:
+  displayName: "Web3 High Memory Utilization"
+  documentation:
+    content: "Alert when memory utilization exceeds 85% for Web3 services"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider Memory High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/memory/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 85
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  - displayName: "BigQuery Service Memory High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/memory/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 85
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  - displayName: "Web3 Security Memory High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/memory/utilizations"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-security"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 85
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-high-error-rate
+  namespace: config-control
+spec:
+  displayName: "Web3 High Error Rate"
+  documentation:
+    content: "Alert when error rate exceeds 5% for Web3 services"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider Error Rate High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+        metric.label.response_code_class!="2xx"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 5
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "BigQuery Service Error Rate High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+        metric.label.response_code_class!="2xx"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 5
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Web3 Security Error Rate High"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-security"
+        metric.label.response_code_class!="2xx"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 5
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-high-latency
+  namespace: config-control
+spec:
+  displayName: "Web3 High Latency"
+  documentation:
+    content: "Alert when P95 latency exceeds 1000ms for Web3 services"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider High Latency"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_latencies"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1000
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_PERCENTILE_95"
+        crossSeriesReducer: "REDUCE_PERCENTILE_95"
+  - displayName: "BigQuery Service High Latency"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_latencies"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1000
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_PERCENTILE_95"
+        crossSeriesReducer: "REDUCE_PERCENTILE_95"
+  - displayName: "Web3 Security High Latency"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_latencies"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-security"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1000
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_PERCENTILE_95"
+        crossSeriesReducer: "REDUCE_PERCENTILE_95"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-low-request-rate
+  namespace: config-control
+spec:
+  displayName: "Web3 Low Request Rate"
+  documentation:
+    content: "Alert when request rate drops below expected minimum for Web3 services"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider Low Traffic"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+      duration: "600s"
+      comparison: "COMPARISON_LT"
+      thresholdValue: 0.1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "BigQuery Service Low Traffic"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/request_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+      duration: "600s"
+      comparison: "COMPARISON_LT"
+      thresholdValue: 0.1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-bigquery-quota-exceeded
+  namespace: config-control
+spec:
+  displayName: "BigQuery Quota Exceeded"
+  documentation:
+    content: "Alert when BigQuery operations exceed quota limits"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "BigQuery Query Quota Exceeded"
+    conditionThreshold:
+      filter: |
+        metric.type="bigquery.googleapis.com/query/count"
+        resource.type="bigquery_project"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 10000
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "BigQuery Slots Usage High"
+    conditionThreshold:
+      filter: |
+        metric.type="bigquery.googleapis.com/slots/total_allocated"
+        resource.type="bigquery_project"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1000
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_MEAN"
+        crossSeriesReducer: "REDUCE_MEAN"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-security-events
+  namespace: config-control
+spec:
+  displayName: "Web3 Security Events"
+  documentation:
+    content: "Alert on security-related events and suspicious activities"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "High Number of Auth Failures"
+    conditionThreshold:
+      filter: |
+        metric.type="logging.googleapis.com/user/web3-auth-failures"
+        resource.type="global"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 10
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Suspicious Activity Detected"
+    conditionThreshold:
+      filter: |
+        metric.type="logging.googleapis.com/user/web3-suspicious-activity"
+        resource.type="global"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 5
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Security Policy Violations"
+    conditionThreshold:
+      filter: |
+        metric.type="logging.googleapis.com/user/web3-policy-violations"
+        resource.type="global"
+      duration: "300s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_RATE"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-security-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-cost-anomaly
+  namespace: config-control
+spec:
+  displayName: "Web3 Cost Anomaly Detection"
+  documentation:
+    content: "Alert when costs deviate significantly from expected patterns"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Cloud Run Cost Spike"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/cost"
+        resource.type="global"
+        metric.label.service="Cloud Run"
+      duration: "3600s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 100
+      aggregations:
+      - alignmentPeriod: "3600s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "BigQuery Cost Spike"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/cost"
+        resource.type="global"
+        metric.label.service="BigQuery"
+      duration: "3600s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 500
+      aggregations:
+      - alignmentPeriod: "3600s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Pub/Sub Cost Spike"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/cost"
+        resource.type="global"
+        metric.label.service="Pub/Sub"
+      duration: "3600s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 50
+      aggregations:
+      - alignmentPeriod: "3600s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-cost-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-service-availability
+  namespace: config-control
+spec:
+  displayName: "Web3 Service Availability"
+  documentation:
+    content: "Alert when Web3 services become unavailable or unresponsive"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Web3 Provider Unavailable"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/instance_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-provider"
+      duration: "300s"
+      comparison: "COMPARISON_LT"
+      thresholdValue: 1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "BigQuery Service Unavailable"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/instance_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="bigquery-service"
+      duration: "300s"
+      comparison: "COMPARISON_LT"
+      thresholdValue: 1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Web3 Security Unavailable"
+    conditionThreshold:
+      filter: |
+        metric.type="run.googleapis.com/container/instance_count"
+        resource.type="cloud_run_revision"
+        resource.label.service_name="web3-security"
+      duration: "300s"
+      comparison: "COMPARISON_LT"
+      thresholdValue: 1
+      aggregations:
+      - alignmentPeriod: "60s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: web3-billing-budget
+  namespace: config-control
+spec:
+  displayName: "Web3 Billing Budget Alert"
+  documentation:
+    content: "Alert when monthly billing exceeds budget thresholds"
+    mimeType: "text/markdown"
+  conditions:
+  - displayName: "Monthly Budget 50% Exceeded"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/billing/monthly_cost"
+        resource.type="global"
+      duration: "86400s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 500
+      aggregations:
+      - alignmentPeriod: "86400s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Monthly Budget 80% Exceeded"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/billing/monthly_cost"
+        resource.type="global"
+      duration: "86400s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 800
+      aggregations:
+      - alignmentPeriod: "86400s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  - displayName: "Monthly Budget 100% Exceeded"
+    conditionThreshold:
+      filter: |
+        metric.type="cloudbilling.googleapis.com/billing/monthly_cost"
+        resource.type="global"
+      duration: "86400s"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 1000
+      aggregations:
+      - alignmentPeriod: "86400s"
+        perSeriesAligner: "ALIGN_SUM"
+        crossSeriesReducer: "REDUCE_SUM"
+  combiner: "OR"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-budget-alerts"
+
+---
+# Notification Channel Definitions
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringNotificationChannel
+metadata:
+  name: web3-alerts
+  namespace: config-control
+spec:
+  displayName: "Web3 Integration Alerts"
+  type: "email"
+  labels:
+    email_address: "${SECURITY_EMAIL}"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringNotificationChannel
+metadata:
+  name: web3-security-alerts
+  namespace: config-control
+spec:
+  displayName: "Web3 Security Alerts"
+  type: "email"
+  labels:
+    email_address: "${SECURITY_EMAIL}"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringNotificationChannel
+metadata:
+  name: web3-cost-alerts
+  namespace: config-control
+spec:
+  displayName: "Web3 Cost Alerts"
+  type: "email"
+  labels:
+    email_address: "${BUDGET_EMAIL}"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringNotificationChannel
+metadata:
+  name: web3-budget-alerts
+  namespace: config-control
+spec:
+  displayName: "Web3 Budget Alerts"
+  type: "email"
+  labels:
+    email_address: "${BUDGET_EMAIL}"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringNotificationChannel
+metadata:
+  name: web3-slack-alerts
+  namespace: config-control
+spec:
+  displayName: "Web3 Slack Alerts"
+  type: "slack"
+  labels:
+    channel_name: "#web3-alerts"
+    auth_token: "${SLACK_TOKEN}"
+
+---
+# Uptime Check Configuration
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringUptimeCheckConfig
+metadata:
+  name: web3-provider-uptime
+  namespace: config-control
+spec:
+  displayName: "Web3 Provider Uptime Check"
+  timeout: "10s"
+  period: "60s"
+  httpCheck:
+    path: "/health"
+    port: 8080
+    useSsl: true
+    validateSsl: true
+  monitoredResource:
+    type: "uptime_url"
+    labels:
+      host: "${WEB3_PROVIDER_URL}"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringUptimeCheckConfig
+metadata:
+  name: bigquery-service-uptime
+  namespace: config-control
+spec:
+  displayName: "BigQuery Service Uptime Check"
+  timeout: "10s"
+  period: "60s"
+  httpCheck:
+    path: "/health"
+    port: 8080
+    useSsl: true
+    validateSsl: true
+  monitoredResource:
+    type: "uptime_url"
+    labels:
+      host: "${BIGQUERY_SERVICE_URL}"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-alerts"
+
+---
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringUptimeCheckConfig
+metadata:
+  name: web3-security-uptime
+  namespace: config-control
+spec:
+  displayName: "Web3 Security Service Uptime Check"
+  timeout: "10s"
+  period: "60s"
+  httpCheck:
+    path: "/health"
+    port: 8080
+    useSsl: true
+    validateSsl: true
+  monitoredResource:
+    type: "uptime_url"
+    labels:
+      host: "${WEB3_SECURITY_URL}"
+  notificationChannels:
+  - "projects/${PROJECT_ID}/notificationChannels/web3-security-alerts"

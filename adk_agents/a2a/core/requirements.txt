@@ -1,0 +1,8 @@
+cryptography>=42.0.0
+aiohttp>=3.9.0
+websockets>=12.0
+pyjwt>=2.8.0
+pydantic>=2.0.0
+asyncio-mqtt>=0.13.0  # Optional for MQTT transport
+fastapi>=0.104.0     # Optional for REST API endpoints
+uvicorn>=0.24.0      # Optional for ASGI server

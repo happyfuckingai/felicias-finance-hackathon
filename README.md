@@ -1,18 +1,8 @@
-# Felicia's Finance - Integrated Crypto-Banking Platform
+# Felicia's Finance - GKE Turns 10 Hackathon Submission
 
-Detta repository innehåller Felicia's Finance crypto-banking system som är integrerat med Bank of Anthos för att skapa en enhetlig, enterprise-grade crypto-banking plattform.
+Detta repository innehåller Felicia's Finance hackathon-submission för **GKE Turns 10 Hackathon**.
 
-## 🏗️ Systemöversikt
-
-Detta är en integrerad lösning som kombinerar:
-- **Bank of Anthos** (traditionell bankfunktionalitet)
-- **Felicia's Finance** (crypto-banking och Web3-funktionalitet)
-- **Agentic AI-kapaciteter** för intelligent automation
-- **Google Cloud Platform** för skalbar infrastruktur
-
-Allt deployas som en enhetlig plattform på Google Kubernetes Engine (GKE).
-
-## 📁 Systemkomponenter
+## 📁 Inkluderade Komponenter
 
 ### 🧠 Agent Core (`agent_core/`)
 Central agent-kärna som hanterar intelligent automation:
@@ -62,16 +52,6 @@ Hjälpskript för systemhantering:
 - **Health checks**: Systemstatus och övervakning
 - **Data migration**: Cross-system datahantering
 
-## 🎯 Syfte och Användning
-
-Dessa komponenter är designade för att:
-
-1. **Demonstrera agentic AI-kapaciteter** på Google Kubernetes Engine
-2. **Integrera med befintliga mikroservice-applikationer** utan att modifiera dem
-3. **Visa multi-agent orchestration** för komplexa finansiella arbetsflöden
-4. **Implementera säkra API-interaktioner** mellan olika system
-5. **Erbjuda skalbara, moln-nativa lösningar** för enterprise-användning
-
 ## 🎯 Systemfunktioner
 
 Detta är en **enterprise-grade crypto-banking plattform** som kombinerar:
@@ -119,21 +99,6 @@ Detta är en **enterprise-grade crypto-banking plattform** som kombinerar:
 │  └─────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-## 🛠️ Tekniska Krav
-
-### Förutsättningar
-- Google Cloud Platform-konto
-- GKE-kluster åtkomst
-- Bank of Anthos eller Online Boutique instans
-- Grundläggande kunskaper om Kubernetes och Docker
-
-### Installation
-1. Klona detta repository
-2. Konfigurera Google Cloud-autentisering
-3. Deploya infrastrukturen med Terraform
-4. Starta MCP-servrarna
-5. Konfigurera ADK-agenter
 
 ## 📋 GKE Turns 10 Hackathon Compliance
 

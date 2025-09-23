@@ -1,0 +1,188 @@
+[
+  {
+    "name": "token_address",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Token contract address"
+  },
+  {
+    "name": "token_symbol",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Token symbol"
+  },
+  {
+    "name": "token_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Token full name"
+  },
+  {
+    "name": "chain_id",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Blockchain network ID"
+  },
+  {
+    "name": "decimals",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Token decimals"
+  },
+  {
+    "name": "total_supply",
+    "type": "BIGNUMERIC",
+    "mode": "NULLABLE",
+    "description": "Total token supply"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Analytics timestamp"
+  },
+  {
+    "name": "price_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Token price in USD"
+  },
+  {
+    "name": "market_cap",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Market capitalization in USD"
+  },
+  {
+    "name": "volume_24h",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "24h trading volume in USD"
+  },
+  {
+    "name": "price_change_24h",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "24h price change percentage"
+  },
+  {
+    "name": "holders_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of token holders"
+  },
+  {
+    "name": "transfers_24h",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of transfers in last 24h"
+  },
+  {
+    "name": "liquidity_usd",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total liquidity in USD"
+  },
+  {
+    "name": "buy_pressure",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Buy pressure indicator (0-1)"
+  },
+  {
+    "name": "sell_pressure",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Sell pressure indicator (0-1)"
+  },
+  {
+    "name": "volatility_24h",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "24h price volatility"
+  },
+  {
+    "name": "rsi_14",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "14-period RSI indicator"
+  },
+  {
+    "name": "macd_signal",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "MACD signal (buy/sell/hold)"
+  },
+  {
+    "name": "sentiment_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Social sentiment score (-1 to 1)"
+  },
+  {
+    "name": "whale_transactions_24h",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of whale transactions (>100k USD)"
+  },
+  {
+    "name": "large_transactions_24h",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Number of large transactions (>10k USD)"
+  },
+  {
+    "name": "unique_wallets_24h",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Unique active wallets in 24h"
+  },
+  {
+    "name": "gas_used_avg",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Average gas used per transaction"
+  },
+  {
+    "name": "contract_verified",
+    "type": "BOOLEAN",
+    "mode": "NULLABLE",
+    "description": "Whether contract is verified"
+  },
+  {
+    "name": "honeypot_status",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Honeypot status (safe/suspicious/dangerous)"
+  },
+  {
+    "name": "risk_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Overall risk score (0-100)"
+  },
+  {
+    "name": "liquidity_pools",
+    "type": "JSON",
+    "mode": "REPEATED",
+    "description": "Liquidity pool information"
+  },
+  {
+    "name": "price_history",
+    "type": "JSON",
+    "mode": "NULLABLE",
+    "description": "Price history data points"
+  },
+  {
+    "name": "created_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record creation timestamp"
+  },
+  {
+    "name": "updated_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Record update timestamp"
+  }
+]
