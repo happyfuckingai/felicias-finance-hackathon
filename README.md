@@ -257,7 +257,6 @@ cp -r felicias-finance my-domain-integration
 ### **Technical Roadmap:**
 - **Multi-Domain Templates** - Färdiga mallar för olika branscher
 - **Protocol Extensions** - Utökade protokoll för nya tekniker
-- **Cross-Reality Integration** - AR/VR och metaverse-kopplingar
 - **Universal AI Networks** - AI som förstår alla tekniska domäner
 
 ---
