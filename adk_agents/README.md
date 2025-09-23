@@ -12,20 +12,6 @@ This module provides Google Cloud Platform (GCP) integration for the Felicia Fin
 - **Graceful Degradation**: Offline mode support when GCP services are unavailable
 - **Lazy Initialization**: On-demand service initialization for optimal resource usage
 
-## Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  LiveKit Agent  │────│ ADK Integration │────│ GCP ADK Agents  │
-│   (Orchestrator) │    │    Wrapper      │    │ (Cloud Functions)│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │ MCP Servers     │
-                    │ Banking & Crypto│
-                    └─────────────────┘
 ```
 
 ## Installation
