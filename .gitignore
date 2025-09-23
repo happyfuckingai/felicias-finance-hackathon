@@ -1,0 +1,116 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.pytest_cache/
+.cache/
+*.pyc
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Sensitive files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# AI/LLM tools - CRITICAL: Must not be public
+.gemini/
+.roo/
+.specify/
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+build/
+dist/
+.next/
+out/
+
+# Coverage
+.coverage
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.tox/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentation
+docs/_build/
+
+# Docker
+.dockerignore
+
+# Other
+*.md.bak
