@@ -5,11 +5,11 @@ Detta repository innehåller Felicia's Finance hackathon-submission för **GKE T
 ## 📁 Inkluderade Komponenter
 
 ### 🧠 Agent Core (`agent_core/`)
-Central agent-kärna som hanterar intelligent automation:
-- **agent.py**: Huvudagent för crypto-banking operationer
-- **prompts.py**: AI-prompts för finansiella analyser
-- **tools.py**: Specialiserade verktyg för banking och crypto
-- **mcp_client/**: MCP-protokoll för systemintegration
+**KOMMUNIKATIONSAGENTEN - Användarens ansikte utåt:**
+- **agent.py**: Huvudkommunikationsagent som användaren interagerar med
+- **prompts.py**: AI-prompts för naturlig språkförståelse och svar
+- **tools.py**: Kommunikationsverktyg för användarinteraktion
+- **mcp_client/**: Integration med bakomliggande system via MCP-protokoll
 
 ### 🔄 ADK Agents (`adk_agents/`)
 Google Cloud ADK integration för agentic AI-kapaciteter:
@@ -174,12 +174,6 @@ Denna implementation representerar **ett white paper för framtidens agentsystem
 - **Composable Agents**: Modulära komponenter som kan kombineras för olika användningsfall
 - **Context Awareness**: Kontinuerlig inlärning och anpassning baserat på användarbeteende
 
-### 🔐 Proprietary Components
-Crypto-komponenterna i detta repository är **demonstrationsversioner** som visar integrationsmöjligheter. De faktiska proprietära systemen inkluderar:
-- **Advanced AI orchestrators** för komplexa multi-step operationer
-- **Custom ML models** för finansiella prediktioner
-- **Enterprise security layers** för produktionsanvändning
-- **Scalable infrastructure** för högvolym operationer
 
 ### 📈 Innovation Focus
 Detta projekt demonstrerar **hur framtidens agentsystem bör byggas**:
