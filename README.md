@@ -4,9 +4,6 @@
 
 ---
 
-## Svensk Version
-
----
 
 ## Svensk Version
 
