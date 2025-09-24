@@ -1,4 +1,4 @@
-# 🌟 Felicia's Finance: Beyond the Hackathon
+## 🌟  THE RECIPE AND INSPIRATION FOR GOOGLE'S STARTUP TECHNICAL GUIDE 
 
 *This README contains both a Swedish and an English version. The Swedish version is followed by the English version.*
 
