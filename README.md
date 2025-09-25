@@ -1,6 +1,3 @@
-## 🌟  THE RECIPE AND INSPIRATION FOR GOOGLE'S STARTUP TECHNICAL GUIDE 
-https://cloud.google.com/resources/content/building-ai-agents
-
 *This README contains both a Swedish and an English version. The Swedish version is followed by the English version.*
 
 ---
