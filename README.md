@@ -1,5 +1,3 @@
-- **Demonstration Video:** [https://youtu.be/8tbVEjUg-zY?feature=shared](https://youtu.be/8tbVEjUg-zY?feature=shared)
-
 # 🌟 Felicia's Finance: Beyond the Hackathon
 
 > *From a simple hackathon idea to a revolution in democratized technology for all domains*
