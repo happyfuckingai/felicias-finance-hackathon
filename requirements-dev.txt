@@ -1,0 +1,61 @@
+# Development dependencies for Felicia's Finance
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.10.0
+pytest-xdist>=3.0.0
+
+# Code Quality
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+pylint>=2.17.0
+mypy>=1.0.0
+
+# Security
+bandit>=1.7.0
+safety>=2.3.0
+
+# Documentation
+sphinx>=6.0.0
+sphinx-rtd-theme>=1.2.0
+myst-parser>=1.0.0
+
+# Pre-commit hooks
+pre-commit>=3.0.0
+
+# Development tools
+ipython>=8.0.0
+jupyter>=1.0.0
+notebook>=6.5.0
+
+# API development
+fastapi>=0.95.0
+uvicorn>=0.20.0
+httpx>=0.24.0
+
+# Database
+alembic>=1.10.0
+psycopg2-binary>=2.9.0
+redis>=4.5.0
+
+# Cryptography
+cryptography>=40.0.0
+pyjwt>=2.6.0
+pyopenssl>=23.0.0
+
+# Kubernetes
+kubernetes>=26.0.0
+pyyaml>=6.0.0
+
+# Monitoring
+prometheus-client>=0.16.0
+structlog>=23.0.0
+
+# Utilities
+click>=8.1.0
+python-dotenv>=1.0.0
+requests>=2.28.0
+aiohttp>=3.8.0

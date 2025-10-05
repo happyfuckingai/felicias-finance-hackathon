@@ -36,14 +36,17 @@ This project's technical architecture **predates** similar concepts in Google's 
 git clone https://github.com/happyfuckingai/felicias-finance-hackathon.git
 cd felicias-finance-hackathon
 
+# Check prerequisites
+make env-check
+
 # Set up development environment
 make install-dev
 
 # Deploy to local cluster
 make deploy-local
 
-# Access services
-kubectl port-forward svc/orchestrator 8080:8080 -n felicias-finance-dev
+# Access services (or use make port-forward)
+make port-forward
 ```
 
 ### Production Deployment
@@ -53,14 +56,13 @@ cp .env.example .env
 # Edit .env with your configuration
 
 # Deploy infrastructure
-cd infrastructure/terraform
-terraform init && terraform apply
+make deploy-infrastructure
 
 # Deploy application
-helm install felicias-finance ./infrastructure/helm/felicias-finance \
-  --namespace felicias-finance \
-  --create-namespace \
-  --values ./infrastructure/helm/values/production.yaml
+make deploy-prod
+
+# Check deployment status
+make status
 ```
 
 ## 🏗️ Architecture Overview
