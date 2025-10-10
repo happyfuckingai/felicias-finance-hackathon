@@ -35,29 +35,29 @@ Detta system är inte en monolitisk applikation - det är **ett recept med de fi
 ### **🥘 Ingredienserna:**
 
 ```
-🌐 Web Standards       🐍 Python           ☁️ Google Cloud
+🌐 Web Standards       🐍 Python           ☁️ Google Cloud / AWS
    ↓                    ↓                   ↓
-HTTP/2, WebSocket,   AsyncIO,           GKE, BigQuery,
-JSON, REST APIs      FastAPI,           Cloud Functions
+HTTP/2, WebSocket,   AsyncIO,           GKE/ECS, BigQuery/RDS,
+JSON, REST APIs      FastAPI,           Cloud Functions/Lambda
                      SQLAlchemy
 
 🔐 Security           🤖 AI & Agents       🔗 Protocols
    ↓                    ↓                   ↓
 JWT, OAuth2,         OpenAI, Gemini,      MCP, ADK, A2A,
-AES-256-GCM,         Transformers,        WebSocket,
+AES-256-GCM,         Claude, Transformers, WebSocket,
 X.509 certs          Scikit-learn         REST APIs
 
 🗄️ Data & Storage    🐳 Containers        🏗️ Infrastructure
    ↓                    ↓                   ↓
-PostgreSQL,          Docker,              Kubernetes,
-Redis, BigQuery      Docker Compose       Terraform,
+PostgreSQL,          Docker,              Kubernetes/ECS,
+Redis, BigQuery/RDS  Docker Compose       Terraform,
 JSON, YAML           Podman               Helm
 ```
 
 ### **👨‍🍳 Receptet:**
-1. **Ta Google Cloud** som stabil grund (som en bra fond)
-2. **Tillsätt Kubernetes** för orkestrering (som en pålitlig ugn)
-3. **Vik in AI-modeller** från OpenAI och Google (kryddor som ger smak)
+1. **Ta Google Cloud eller AWS** som stabil grund (som en bra fond)
+2. **Tillsätt Kubernetes/ECS** för orkestrering (som en pålitlig ugn)
+3. **Vik in AI-modeller** från OpenAI, Google och AWS (kryddor som ger smak)
 4. **Strö över säkerhetsprotokoll** för att skydda allt
 5. **Garnera med** Web3-integrationer och realtids-kommunikation
 6. **Servera** genom en enkel HTTP API
@@ -100,22 +100,33 @@ Alla Teknologier + Intelligens = Unified Experience
 
 ---
 
-## 🏗️ Teknisk Arkitektur
+## 🏗️ Arkitektur
 
-### **A2A Protocol (Agent-to-Agent)**
-Vårt revolutionerande kommunikationsprotokoll inspirerat av Google's A2A:
+Felicia's Finance är byggt med en **multi-cloud arkitektur** som stödjer både Google Cloud och AWS:
 
-```
-Agent Discovery → Capability Matching → Encrypted Communication → Task Execution
-        ↓                ↓                     ↓                     ↓
-   Service Registry   Load Balancing     AES-256-GCM          Result Aggregation
-```
+### **Kärnkomponenter:**
+- **AI-Agenter**: Autonoma handelsagenter med specialiserade roller
+- **Crypto Services**: Real-tids data från flera källor (CoinGecko, CoinMarketCap, DexScreener)
+- **Risk Management**: Automatisk riskkontroll med VaR-beräkningar
+- **Monitoring**: Hälsoövervakning och prestandaanalys
 
-**Nyckelkomponenter:**
-- **Identity Management**: RSA-2048 keys + X.509 certificates
-- **Authentication**: JWT + OAuth2 + Mutual TLS
-- **Transport**: HTTP/2 + WebSocket med automatisk failover
-- **Orchestration**: Intelligent task-delegation och workflow-koordinering
+### **Google Cloud Stack:**
+- **GKE**: Kubernetes för containerorkestrering
+- **BigQuery**: Data warehousing och analys
+- **Cloud Functions**: Serverless funktioner för event-driven processing
+- **Cloud Storage**: Säker fillagring
+
+### **AWS Stack:**
+- **ECS**: Container orkestrering med Fargate
+- **RDS**: Relationsdatabaser för transaktionell data
+- **Lambda**: Serverless funktioner för skalbar processing
+- **S3**: Objektlagring för data och modeller
+
+### **Gemensamma Tjänster:**
+- **Kubernetes/ECS**: Containerorkestrering
+- **BigQuery/RDS**: Datahantering
+- **Cloud Functions/Lambda**: Serverless computing
+- **AI-modeller**: OpenAI, Google AI, AWS Bedrock
 
 ### **Integration Layer**
 ```
@@ -200,6 +211,34 @@ pip install -r requirements.txt
 python -m crypto.demo.basic_demo
 ```
 
+### **Deployment på Google Cloud:**
+```bash
+# Google Cloud deployment
+cd infrastructure/
+terraform init
+terraform plan -var-file=terraform.tfvars
+terraform apply
+
+# Eller använd Cloud Build
+gcloud builds submit --config cloudbuild.yaml
+```
+
+### **Deployment på AWS:**
+```bash
+# AWS deployment (Agent Hackathon branch)
+git checkout aws-infrastructure-only
+cd infrastructure/aws/
+
+# Terraform deployment
+terraform init
+terraform workspace select dev  # eller prod
+terraform plan
+terraform apply
+
+# Eller använd deployment script
+./scripts/deploy.sh
+```
+
 ### **För Utvecklare:**
 ```bash
 # Bidra till open source-projektet
@@ -233,10 +272,10 @@ cp -r felicias-finance my-domain-integration
 
 ### **System Capabilities:**
 - ✅ **Multi-Domain Support**: Alla tekniska domäner och API:er
-- ✅ **Real-tids Analytics**: BigQuery-driven insights
-- ✅ **Enterprise Security**: Google Cloud säkerhetsstandarder
-- ✅ **Scalable Architecture**: Kubernetes-native design
-- ✅ **Universal AI Integration**: Alla AI-modeller och providers
+- ✅ **Real-tids Analytics**: BigQuery/RDS-driven insights
+- ✅ **Enterprise Security**: Google Cloud/AWS säkerhetsstandarder
+- ✅ **Scalable Architecture**: Kubernetes/ECS-native design
+- ✅ **Universal AI Integration**: Alla AI-modeller och providers (OpenAI, Google, AWS)
 
 ### **Performance Metrics:**
 - **Sub-sekund** agent-till-agent kommunikation

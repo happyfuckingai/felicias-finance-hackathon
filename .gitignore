@@ -39,6 +39,13 @@ awscliv2.zip
 *.swp
 *.swo
 *~
+.roo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
 
 # OS
 .DS_Store
