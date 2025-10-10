@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felicia's Finance: AI-Driven Hybrid Banking Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #2a5298;
+            font-size: 1.8em;
+            margin: 30px 0 15px 0;
+        }
+
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .tech-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .tech-item h4 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .architecture-diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+
+        .timeline-item h4 {
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.1em;
+            color: #666;
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin: 30px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin: 5px;
+        }
+
+        .badge.tech {
+            background: #007bff;
+        }
+
+        .badge.personal {
+            background: #dc3545;
+        }
+
+        .badge.vision {
+            background: #6f42c1;
+        }
+
+        footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer h3 {
+            margin-bottom: 15px;
+        }
+
+        footer p {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .tech-stack {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>Felicia's Finance</h1>
+            <p>AI-Driven Hybrid Banking Platform</p>
+            <div style="margin-top: 20px;">
+                <span class="badge tech">MCP</span>
+                <span class="badge tech">A2A</span>
+                <span class="badge tech">ADK</span>
+                <span class="badge tech">GKE</span>
+                <span class="badge tech">Gemini</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <section class="section">
+                <h2>🎯 Inspiration</h2>
+                <p>This project was born from a simple but powerful question: What if we could build a secure and intelligent bridge between the slow, stable world of traditional finance and the fast-paced, complex world of DeFi?</p>
+                <p style="margin-top: 15px;">We were inspired by Google's Bank of Anthos, not as a standalone demo, but as a foundational component in a larger, more intelligent system. Our goal was to create a true Hybrid Finance (HyFi) platform that makes advanced finance accessible to everyone, orchestrated by a single, powerful AI agent.</p>
+            </section>
+
+            <section class="section">
+                <h2>🚀 What it does</h2>
+                <p><strong>Felicia's Finance</strong> is an AI-driven private banking platform fronted by "Felicia," an intelligent AI agent that acts as your personal financial partner. Through a simple, conversational interface, a user can:</p>
+
+                <div class="highlight-box">
+                    <p><strong>Connect to Traditional Banking:</strong> Using our Bank of Anthos MCP server wrapper, Felicia can access account balances and execute fiat transfers with enterprise-grade security.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Invest in DeFi Intelligently:</strong> Felicia leverages our advanced Crypto MCP server with built-in AI orchestration to perform real-time market analysis, generate trading signals, and manage crypto portfolios autonomously.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Get Holistic Financial Advice:</strong> Because Felicia operates in both worlds, she can provide comprehensive risk analysis and investment advice that covers a user's entire financial landscape - from traditional banking to DeFi investments.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Experience Real-time AI Orchestration:</strong> Through our A2A (Agent-to-Agent) communication protocol, Felicia coordinates complex multi-step financial workflows behind the scenes, providing live progress updates via event streaming.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>See Dynamic Visualizations:</strong> Using MCP-UI integration, Felicia can dynamically render interactive charts, portfolio breakdowns, and risk analysis visualizations directly in the conversational interface.</p>
+                </div>
+
+                <p style="margin-top: 20px;"><em>Essentially, Felicia's Finance allows you to give a high-level command like, "Invest 1,000 EUR from my bank account into a balanced crypto portfolio," and the entire complex workflow - spanning authentication, fund transfers, market analysis, risk assessment, and portfolio optimization - is orchestrated autonomously in the background with real-time status updates.</em></p>
+            </section>
+
+            <section class="section">
+                <h2>🛠️ How we built it</h2>
+                <p>Felicia's Finance is built on a revolutionary agent-based architecture designed for robustness and scalability on Google Kubernetes Engine (GKE). The system implements our 7-act saga of Felicia's Finance, creating a clean separation between AI orchestration and core systems.</p>
+
+                <h3>The 7-Act Architecture:</h3>
+
+                <div class="architecture-diagram">
+                    <h4>🎭 Act 1: Two Kingdoms, Two Toolboxes</h4>
+                    <p>We created two MCP (Model Context Protocol) servers as specialized toolboxes:</p>
+                    <ul>
+                        <li><strong>Bank MCP Server</strong>: Wraps Bank of Anthos APIs providing traditional banking tools (balance checks, transfers, contacts)</li>
+                        <li><strong>Crypto MCP Server</strong>: Advanced AI-powered toolbox with market analysis, trading signals, and autonomous portfolio management</li>
+                    </ul>
+
+                    <h4>🎭 Act 2: The Invisible Craftsman (Orchestrator Agent)</h4>
+                    <p>Our master Orchestrator Agent, built on Google's ADK framework, acts as the technical "showrunner." This agent analyzes user intentions using Gemini AI, creates detailed execution plans, delegates tasks to appropriate toolboxes, and remains completely invisible to end users.</p>
+
+                    <h4>🎭 Act 3: The Ambassador's Voice (Communication Agent Felicia)</h4>
+                    <p>Felicia, our user-facing AI agent, translates natural language into technical intentions, maintains conversation context, and presents results beautifully.</p>
+
+                    <h4>🎭 Act 4: The Magical Connection (A2A Protocol)</h4>
+                    <p>Using Google's A2A protocol, we created secure agent communication for real-time status updates without coupling.</p>
+
+                    <h4>🎭 Act 5-7: The Living Experience</h4>
+                    <p>LiveKit for conversations, MCP-UI for dynamic visualizations, and mem0.ai for memory.</p>
+                </div>
+
+                <h3>Technical Stack</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <h4>🤖 AI Agents</h4>
+                        <p>Google ADK + Gemini<br>A2A Protocol<br>Multi-agent orchestration</p>
+                    </div>
+                    <div class="tech-item">
+                        <h4>🔧 Backend</h4>
+                        <p>FastAPI servers<br>MCP toolboxes<br>Event streaming</p>
+                    </div>
+                    <div class="tech-item">
+                        <h4>☁️ Cloud</h4>
+                        <p>GKE Autopilot<br>Cloud SQL<br>Cloud Monitoring</p>
+                    </div>
+                    <div class="tech-item">
+                        <h4>💬 Frontend</h4>
+                        <p>LiveKit SDK<br>MCP-UI components<br>Real-time chat</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>🚧 Challenges we ran into</h2>
+                <p>The greatest challenge wasn't technical; it was personal. My biggest obstacle has always been bringing things to a close.</p>
+                <p>The hardest part of this entire project was not building the federated architecture or implementing the AI. It was the internal battle to reach a point of completion, to resist the urge to endlessly refine, and to finally decide that what I have built is something I can be proud of and submit.</p>
+                <p>This hackathon submission, therefore, represents not just the solution to a technical problem, but a victory over my own greatest challenge: the art of completion.</p>
+            </section>
+
+            <section class="section">
+                <h2>🏆 Accomplishments that we're proud of</h2>
+
+                <h3>My greatest accomplishment with this project is not just the final code, but the revolutionary process used to create it, and the humble hardware it was built on.</h3>
+
+                <div style="margin: 30px 0;">
+                    <h4>💼 Entrepreneurial Journey</h4>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <h3>23</h3>
+                            <p>Age when I quit safe job to start construction company</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>9.5M SEK</h3>
+                            <p>Revenue in second year as entrepreneur</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>>1M SEK</h3>
+                            <p>Bottom-line profit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>🔄 Complete Transformation</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Construction Entrepreneur</h4>
+                        <p>Built successful Swedish construction company from scratch</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>AI Visionary</h4>
+                        <p>Saw future in autonomous systems, left successful career</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Zero to Expert</h4>
+                        <p>From "Python? Snake!" to AI architect in one year</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>ADHD Triumph</h4>
+                        <p>First major project completion despite lifelong challenges</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Democratization</h4>
+                        <p>Built entire system for free on old laptop with open tools</p>
+                    </div>
+                </div>
+
+                <div class="quote">
+                    "Felicia's Finance is the first time I have ever reached a point where I can consciously decide to 'complete' a stage of work, submit it, and feel an immense sense of pride in what I have created. It is the proof to myself that the same drive that turned a drunken bet into a real company could be channeled to build something truly groundbreaking, starting from nothing."
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>💡 What we learned</h2>
+                <p>The most profound lesson has been that <strong>the hardest part of any great journey is not the journey itself, but having the courage to take the very first step</strong>.</p>
+                <p>On a technical level, this project embodies the philosophy captured by Alfred North Whitehead: "Civilization advances by extending the number of important operations which we can perform without thinking about them." We learned that the true power of an AI agent comes from the strength of the ecosystem it operates in—a system designed to automate complexity, freeing up human time and energy for what truly matters.</p>
+            </section>
+
+            <section class="section">
+                <h2>🔮 What's next for Felicia's Finance</h2>
+                <p>Felicia's Finance is not the culmination of my work. It is my "Hello, World!"</p>
+                <p>It is the first public demonstration of a powerful, proprietary AI ecosystem I have engineered. It is the proof-of-concept that validates the foundation. This is where the real journey begins.</p>
+                <p>My ultimate vision is to build a suite of interconnected, AI-powered applications that will fundamentally change how we interact with technology. The next application is already designed: "Assistenten Svea," named after my other sister, an autonomous accounting system for the construction industry. This isn't the end of a hackathon project; it is the public beginning of a lifelong mission. A mission to build tools that empower people, to advance technology for my home nation, Sweden, and ultimately, for all of humanity.</p>
+            </section>
+        </div>
+
+        <footer>
+            <h3>🎭 Felicia's Finance</h3>
+            <p>Building bridges between traditional finance and DeFi through intelligent AI orchestration</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                <span class="badge personal">Personal Triumph</span>
+                <span class="badge tech">Technical Innovation</span>
+                <span class="badge vision">Future Vision</span>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

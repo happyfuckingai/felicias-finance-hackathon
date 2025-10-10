@@ -1,0 +1,72 @@
+Subject: GKE Turns 10 Hackathon - Submission Issue with Video File Size - Request for Alternative Demonstration
+
+Dear GKE Turns 10 Hackathon Team,
+
+I hope this email finds you well. My name is [Ditt Namn] and I am writing regarding my submission for the GKE Turns 10 Hackathon.
+
+**Issue Encountered:**
+I have completed my project "Felicia's Finance" - an AI-driven hybrid banking platform that integrates Bank of Anthos with advanced crypto-banking capabilities using agentic AI orchestration. However, I encountered a technical issue when attempting to submit:
+
+The demonstration video file size exceeded the platform's upload limits. Despite multiple attempts to compress and optimize the video, the file remained too large for the submission portal.
+
+**Context and Explanation:**
+I must admit that in the final hours of the hackathon, I was completely focused on perfecting the technical implementation and ensuring all system components worked together seamlessly. The video file size limitation was unfortunately the last thing on my mind - I had far more important priorities:
+
+- Finalizing the integration between Bank of Anthos and my crypto-banking system
+- Ensuring the AI agent orchestration worked flawlessly across multiple domains
+- Testing the production deployment on Google Cloud Run
+- Verifying the MCP server communications and A2A protocol implementation
+- Making sure all documentation was complete and accurate
+
+The demonstration video ended up being comprehensive (showing the full end-to-end functionality), which made it larger than anticipated. This was an oversight on my part due to being fully immersed in the technical completion of the project.
+
+**Project Overview:**
+My submission demonstrates:
+- **Integrated Architecture**: Bank of Anthos + Felicia's Finance crypto-banking system
+- **Agentic AI Orchestration**: Multi-agent workflows using Google's ADK and A2A protocols
+- **MCP Server Integration**: Three production-ready MCP servers deployed on Google Cloud Run
+- **Google Web3 Integration**: Native blockchain connectivity for DeFi operations
+- **Production Deployment**: Complete microservices architecture with monitoring and security
+
+**Repository Available:**
+All project code, documentation, and technical details are available at:
+**https://github.com/happyfuckingai/Felicias_financegke**
+
+**Special Development Recording Available:**
+I have also captured a 2-hour screen recording (saved as a zip file) of my final development session that I believe would be particularly valuable for your team to review. This recording shows:
+
+- **Last-minute Google Web3 integration** - How I integrated Google Web3 infrastructure in the final hours
+- **Infrastructure architecture decisions** - Real-time creation of the complete microservices deployment
+- **ADHD development process** - Demonstrates the authentic workflow described in my "About the Project" section
+- **Never-satisfied mentality** - Shows the continuous refinement and improvement process
+- **Production deployment decisions** - How I made critical architectural choices under time pressure
+
+This recording provides an authentic view of how I work and directly relates to the personal story in my challenge submission about overcoming ADHD challenges and the struggle to reach completion.
+
+**Alternative Demonstration Options:**
+I would be happy to present my project through any of these methods:
+
+1. **Screen sharing session** - I can demonstrate the complete system functionality live
+2. **Video call presentation** - Walk through the architecture and show live demos
+3. **Detailed documentation review** - All technical specifications and code are documented
+
+**Proposed Solution:**
+I respectfully request the opportunity to demonstrate my project through a brief screen sharing session or video call, where I can show:
+- The complete integrated system running
+- Live demonstration of the AI agent orchestration
+- Real-time interaction with the MCP servers
+- The production deployment architecture
+
+**Contact Information:**
+- Email: [Din Email]
+- Timezone: CET (Stockholm, Sweden)
+- Availability: Flexible - I can accommodate most time slots
+
+I am extremely proud of what I've built and would greatly appreciate the opportunity to properly demonstrate the innovative hybrid banking platform I've created. The project represents significant technical achievement in AI-agent orchestration and production-ready microservices deployment.
+
+Thank you for your understanding and consideration of my situation.
+
+Best regards,
+Marcus
+Felicia's Finance - GKE Turns 10 Hackathon Participant
+https://github.com/happyfuckingai/Felicias_financegke

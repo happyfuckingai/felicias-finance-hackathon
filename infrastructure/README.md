@@ -96,7 +96,7 @@ infrastructure/
 - kubectl installerad
 
 ### **1. Google Cloud Project Setup:**
-```bash
+```bashvad håller du på med? du hittar på en massa jävla skit och lägger in bara it och lägger in bara
 # Sätt ditt project ID
 export PROJECT_ID="felicia-finance-prod"
 

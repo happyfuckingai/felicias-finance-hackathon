@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "crypto-server": {
+      "command": "bash",
+      "args": ["-c", "cd /home/mr/friday_jarvis2/crypto_mcp_server && source devenv/bin/activate && python crypto_mcp_server.py"],
+      "env": {
+        "CRYPTO_PRIVATE_KEY": ""
+      }
+    }
+  }
+}

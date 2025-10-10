@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (replaces BigQuery for local development)
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: felicia_finance
+      POSTGRES_USER: felicia
+      POSTGRES_PASSWORD: felicia123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U felicia -d felicia_finance"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Web3 Provider Service
+  web3-provider:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.web3-provider
+    environment:
+      - ENVIRONMENT=development
+      - TESTNET=true
+      - BASE_TESTNET_RPC=https://sepolia.base.org
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://felicia:felicia123@postgres:5432/felicia_finance
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # BigQuery Integration Service (using PostgreSQL instead)
+  bigquery-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.bigquery-service
+    environment:
+      - ENVIRONMENT=development
+      - TESTNET=true
+      - POSTGRES_URL=postgresql://felicia:felicia123@postgres:5432/felicia_finance
+      - REDIS_URL=redis://redis:6379
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Web3 Security Service
+  web3-security:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.web3-security
+    environment:
+      - ENVIRONMENT=development
+      - TESTNET=true
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://felicia:felicia123@postgres:5432/felicia_finance
+    ports:
+      - "8082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Crypto MCP Server
+  crypto-mcp-server:
+    build:
+      context: .
+      dockerfile: crypto_mcp_server/Dockerfile
+    environment:
+      - ENVIRONMENT=development
+      - TESTNET=true
+      - MCP_SERVER_HOST=0.0.0.0
+      - MCP_SERVER_PORT=8000
+      - CRYPTO_PRIVATE_KEY=${CRYPTO_PRIVATE_KEY}
+      - BASE_TESTNET_RPC_URL=https://sepolia.base.org
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - MAX_POSITION_SIZE_USD=1000
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      web3-provider:
+        condition: service_healthy
+      bigquery-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./crypto_mcp_server:/app
+
+  # React Frontend (if you want to run it)
+  # frontend:
+  #   build:
+  #     context: ./react_frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8080
+  #     - REACT_APP_MCP_URL=http://localhost:8000
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    driver: bridge
